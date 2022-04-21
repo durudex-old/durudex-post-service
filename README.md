@@ -20,7 +20,7 @@ Service for working with posts.
 </p>
 
 ### 💡 Prerequisites
-+ [Go 1.17](https://golang.org/)
++ [Go 1.18](https://golang.org/)
 + [grpc](https://grpc.io/docs/languages/go/quickstart/)
 + [golangci-lint](https://golangci-lint.run/usage/install/)
 
@@ -53,3 +53,4 @@ Copyright © 2022 [Durudex](https://github.com/durudex). Released under the [GNU
 + [protobuf](https://github.com/protocolbuffers/protobuf/blob/master/LICENSE)
 + [zerolog](https://github.com/rs/zerolog/blob/master/LICENSE)
 + [viper](https://github.com/spf13/viper/blob/master/LICENSE)
++ [uuid](https://github.com/gofrs/uuid/blob/master/LICENSE)

@@ -3,9 +3,11 @@ module github.com/durudex/durudex-post-service
 go 1.18
 
 require (
+	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/rs/zerolog v1.26.1
 	github.com/spf13/viper v1.10.1
 	google.golang.org/grpc v1.45.0
+	google.golang.org/protobuf v1.27.1
 )
 
 require (
@@ -24,7 +26,6 @@ require (
 	golang.org/x/sys v0.0.0-20211210111614-af8b64212486 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

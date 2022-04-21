@@ -15,12 +15,19 @@
  * along with Durudex. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package service
+package domain
 
-// Service structure.
-type Service struct{ Post }
+import (
+	"time"
 
-// Creating a new service.
-func NewService() *Service {
-	return &Service{Post: NewPostService()}
+	"github.com/gofrs/uuid"
+)
+
+// Post structure.
+type Post struct {
+	ID        uuid.UUID
+	AuthorID  uuid.UUID
+	Text      string
+	CreatedAt time.Time
+	UpdatedAt *time.Time
 }

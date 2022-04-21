@@ -18,6 +18,7 @@
 package grpc
 
 import (
+	"github.com/durudex/durudex-post-service/internal/delivery/grpc/pb"
 	"github.com/durudex/durudex-post-service/internal/service"
 
 	"google.golang.org/grpc"
@@ -32,4 +33,6 @@ func NewHandler(service *service.Service) *Handler {
 }
 
 // Registration services handlers.
-func (h *Handler) RegisterHandlers(srv *grpc.Server) {}
+func (h *Handler) RegisterHandlers(srv *grpc.Server) {
+	pb.RegisterPostServiceServer(srv, NewPostHandler(h.service))
+}
