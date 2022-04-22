@@ -17,10 +17,17 @@
 
 package repository
 
+import (
+	"github.com/durudex/dugopg"
+)
+
 // Repository structure.
 type Repository struct{ Post }
 
+// Repository dependency.
+type Deps struct{ Psql dugopg.Native }
+
 // Creating a new repository.
-func NewRepository() *Repository {
-	return &Repository{Post: NewPostRepository()}
+func NewRepository(deps Deps) *Repository {
+	return &Repository{Post: NewPostRepository(deps)}
 }

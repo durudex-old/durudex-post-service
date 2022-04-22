@@ -36,8 +36,8 @@ type Post interface {
 type PostService struct{ repos repository.Post }
 
 // Creating a new post service.
-func NewPostService() *PostService {
-	return &PostService{}
+func NewPostService(repos repository.Post) *PostService {
+	return &PostService{repos: repos}
 }
 
 // Creating a new post.

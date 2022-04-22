@@ -15,37 +15,27 @@
  * along with Durudex. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package repository
+package psql
 
 import (
 	"context"
 
+	"github.com/durudex/dugopg"
 	"github.com/durudex/durudex-post-service/internal/domain"
-	"github.com/durudex/durudex-post-service/internal/repository/psql"
 
 	"github.com/gofrs/uuid"
 )
 
-// Post repository interface.
-type Post interface {
-	Create(ctx context.Context, text string) (uuid.UUID, error)
-	GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)
-}
-
-// Post repository structure.
-type PostRepository struct{ psql *psql.PostRepository }
+// Post postgres repository.
+type PostRepository struct{ psql dugopg.Native }
 
 // Creating a new post repository.
-func NewPostRepository(deps Deps) *PostRepository {
-	return &PostRepository{psql: psql.NewPostRepository(deps.Psql)}
+func NewPostRepository(psql dugopg.Native) *PostRepository {
+	return &PostRepository{psql: psql}
 }
 
-// Creating a new post in database.
-func (r *PostRepository) Create(ctx context.Context, text string) (uuid.UUID, error) {
-	return r.psql.Create(ctx, text)
-}
+// Creating a new post in postgres database.
+func (r *PostRepository) Create(ctx context.Context, text string) (uuid.UUID, error)
 
-// Getting a post by id.
-func (r *PostRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error) {
-	return r.psql.GetByID(ctx, id)
-}
+// Getting a post by id in postgres database.
+func (r *PostRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)

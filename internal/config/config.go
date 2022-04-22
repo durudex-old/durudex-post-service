@@ -28,7 +28,8 @@ import (
 type (
 	// Config variables.
 	Config struct {
-		Server ServerConfig // Server configuration.
+		Server   ServerConfig   // Server configuration.
+		Database DatabaseConfig // Database configuration.
 	}
 
 	// Server config variables.
@@ -44,6 +45,18 @@ type (
 		CACert string `mapstructure:"ca-cert"`
 		Cert   string `mapstructure:"cert"`
 		Key    string `mapstructure:"key"`
+	}
+
+	// Default config variables.
+	DatabaseConfig struct {
+		Postgres PostgresConfig `mapstructure:"postgres"`
+	}
+
+	// Postgres database config variables.
+	PostgresConfig struct {
+		MaxConns int32 `mapstructure:"max-conns"`
+		MinConns int32 `mapstructure:"min-conns"`
+		URL      string
 	}
 )
 
@@ -65,6 +78,9 @@ func Init() (*Config, error) {
 	if err := unmarshal(&cfg); err != nil {
 		return nil, err
 	}
+
+	// Set env configurations.
+	setFromEnv(&cfg)
 
 	return &cfg, nil
 }
@@ -95,21 +111,18 @@ func parseConfigFile() error {
 func unmarshal(cfg *Config) error {
 	log.Debug().Msg("Unmarshal config keys...")
 
+	// Unmarshal database keys.
+	if err := viper.UnmarshalKey("database", &cfg.Database); err != nil {
+		return err
+	}
 	// Unmarshal server keys.
 	return viper.UnmarshalKey("server", &cfg.Server)
 }
 
-// Populate defaults config variables.
-func populateDefaults() {
-	log.Debug().Msg("Populate defaults config variables...")
+// Seting environment variables from .env file.
+func setFromEnv(cfg *Config) {
+	log.Debug().Msg("Set from environment configurations...")
 
-	// Server defaults.
-	viper.SetDefault("server.host", defaultServerHost)
-	viper.SetDefault("server.port", defaultServerPort)
-
-	// TLS server defaults.
-	viper.SetDefault("server.tls.enable", defaultTLSEnable)
-	viper.SetDefault("server.tls.ca-cert", defaultTLSCACert)
-	viper.SetDefault("server.tls.cert", defaultTLSCert)
-	viper.SetDefault("server.tls.key", defaultTLSKey)
+	// Postgres database variables.
+	cfg.Database.Postgres.URL = os.Getenv("POSTGRES_URL")
 }

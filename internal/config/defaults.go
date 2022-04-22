@@ -17,6 +17,11 @@
 
 package config
 
+import (
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
+)
+
 const (
 	// Config defaults.
 	defaultConfigPath string = "configs/main"
@@ -30,4 +35,27 @@ const (
 	defaultTLSCACert string = "./certs/rootCA.pem"
 	defaultTLSCert   string = "./certs/post.service.durudex.local-cert.pem"
 	defaultTLSKey    string = "./certs/post.service.durudex.local-key.pem"
+
+	// Postgres database defaults.
+	defaultDatabasePostgresMaxConns int32 = 20
+	defaultDatabasePostgresMinConns int32 = 5
 )
+
+// Populate defaults config variables.
+func populateDefaults() {
+	log.Debug().Msg("Populate defaults config variables...")
+
+	// Server defaults.
+	viper.SetDefault("server.host", defaultServerHost)
+	viper.SetDefault("server.port", defaultServerPort)
+
+	// TLS server defaults.
+	viper.SetDefault("server.tls.enable", defaultTLSEnable)
+	viper.SetDefault("server.tls.ca-cert", defaultTLSCACert)
+	viper.SetDefault("server.tls.cert", defaultTLSCert)
+	viper.SetDefault("server.tls.key", defaultTLSKey)
+
+	// Postgres database defaults.
+	viper.SetDefault("database.postgres.max-conns", defaultDatabasePostgresMaxConns)
+	viper.SetDefault("database.postgres.min-conns", defaultDatabasePostgresMinConns)
+}

@@ -22,8 +22,13 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/durudex/dugopg/logger/dugopgzerolog"
+	"github.com/durudex/dugopg/pool"
+	"github.com/durudex/dugopg/types"
+	"github.com/durudex/dugopg/types/uuid"
 	"github.com/durudex/durudex-post-service/internal/config"
 	"github.com/durudex/durudex-post-service/internal/delivery/grpc"
+	"github.com/durudex/durudex-post-service/internal/repository"
 	"github.com/durudex/durudex-post-service/internal/server"
 	"github.com/durudex/durudex-post-service/internal/service"
 
@@ -46,8 +51,21 @@ func Run() {
 		log.Error().Err(err).Msg("error initialize config")
 	}
 
+	// PostgreSQL database.
+	psql, err := pool.NewPool(pool.Config{
+		MaxConns: cfg.Database.Postgres.MaxConns,
+		MinConns: cfg.Database.Postgres.MinConns,
+		URL:      cfg.Database.Postgres.URL,
+		Logger:   dugopgzerolog.Init(),
+		Types:    []types.DataType{uuid.UUID},
+	})
+	if err != nil {
+		log.Error().Err(err)
+	}
+
 	// Creating a service and gRPC handler.
-	service := service.NewService()
+	repos := repository.NewRepository(repository.Deps{Psql: psql})
+	service := service.NewService(repos)
 	handler := grpc.NewHandler(service)
 
 	// Create a new server.

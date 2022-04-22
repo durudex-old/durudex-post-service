@@ -26,7 +26,7 @@ import (
 // Test initialize config.
 func TestConfig_Init(t *testing.T) {
 	// Environment configurations.
-	type env struct{ configPath string }
+	type env struct{ configPath, postgresURL string }
 
 	// Testing args.
 	type args struct{ env env }
@@ -34,6 +34,7 @@ func TestConfig_Init(t *testing.T) {
 	// Set environments configurations.
 	setEnv := func(env env) {
 		os.Setenv("CONFIG_PATH", env.configPath)
+		os.Setenv("POSTGRES_URL", env.postgresURL)
 	}
 
 	// Tests structures.
@@ -45,7 +46,7 @@ func TestConfig_Init(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			args: args{env: env{configPath: "fixtures/main"}},
+			args: args{env: env{configPath: "fixtures/main", postgresURL: "postgres://localhost:1"}},
 			want: &Config{
 				Server: ServerConfig{
 					Host: defaultServerHost,
@@ -57,6 +58,12 @@ func TestConfig_Init(t *testing.T) {
 						Key:    defaultTLSKey,
 					},
 				},
+				Database: DatabaseConfig{
+					Postgres: PostgresConfig{
+						MaxConns: defaultDatabasePostgresMaxConns,
+						MinConns: defaultDatabasePostgresMinConns,
+						URL:      "postgres://localhost:1",
+					}},
 			},
 		},
 	}

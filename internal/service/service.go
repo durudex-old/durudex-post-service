@@ -17,10 +17,12 @@
 
 package service
 
+import "github.com/durudex/durudex-post-service/internal/repository"
+
 // Service structure.
 type Service struct{ Post }
 
 // Creating a new service.
-func NewService() *Service {
-	return &Service{Post: NewPostService()}
+func NewService(repos *repository.Repository) *Service {
+	return &Service{Post: NewPostService(repos)}
 }
