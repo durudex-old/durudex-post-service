@@ -28,12 +28,13 @@ Service for working with posts.
 1) Create an `.env` file in the root directory and add the following values from `.env.example`:
 ```env
 # Debug mode.
-DEBUG=true
+DEBUG=false
 
 # Config variables:
 CONFIG_PATH=configs/main
 ```
-2) Generate certificates, information can be found at [certs/README.md](certs/README.md)
+2) Migrate the database using `make migrate-up`.
+3) Generate certificates, information can be found at [certs/README.md](certs/README.md)
 
 Use `make run` to run and `make build` to build project.
 
