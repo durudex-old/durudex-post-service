@@ -31,6 +31,7 @@ import (
 type Post interface {
 	Create(ctx context.Context, text string) (uuid.UUID, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)
+	Delete(ctx context.Context, id uuid.UUID) error
 }
 
 // Post repository structure.
@@ -46,7 +47,12 @@ func (r *PostRepository) Create(ctx context.Context, text string) (uuid.UUID, er
 	return r.psql.Create(ctx, text)
 }
 
-// Getting a post by id.
+// Getting a post by id in database.
 func (r *PostRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error) {
 	return r.psql.GetByID(ctx, id)
+}
+
+// Deleting a post in database.
+func (r *PostRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	return r.psql.Delete(ctx, id)
 }

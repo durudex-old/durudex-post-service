@@ -24,6 +24,7 @@ option go_package = "github.com/durudex/durudex-post-service/internal/delivery/g
 service PostService {
   rpc CreatePost(CreatePostRequest) returns (CreatePostResponse);
   rpc GetPostByID(GetPostByIDRequest) returns (GetPostByIDResponse);
+  rpc DeletePost(DeletePostRequest) returns (DeletePostResponse);
 }
 
 message CreatePostRequest {
@@ -44,3 +45,9 @@ message GetPostByIDResponse {
   google.protobuf.Timestamp created_at = 3;
   optional google.protobuf.Timestamp updated_at = 4;
 }
+
+message DeletePostRequest {
+  bytes id = 1;
+}
+
+message DeletePostResponse {}

@@ -30,6 +30,7 @@ import (
 type Post interface {
 	Create(ctx context.Context, text string) (uuid.UUID, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)
+	Delete(ctx context.Context, id uuid.UUID) error
 }
 
 // Post service structure.
@@ -62,4 +63,9 @@ func (s *PostService) GetByID(ctx context.Context, id uuid.UUID) (domain.Post, e
 	}
 
 	return post, nil
+}
+
+// Deleting a post.
+func (s *PostService) Delete(ctx context.Context, id uuid.UUID) error {
+	return s.repos.Delete(ctx, id)
 }

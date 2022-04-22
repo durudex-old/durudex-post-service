@@ -71,3 +71,19 @@ func (h *PostHandler) GetPostByID(ctx context.Context, input *pb.GetPostByIDRequ
 		UpdatedAt: timestamppb.New(*post.UpdatedAt),
 	}, nil
 }
+
+// Deleting a post.
+func (h *PostHandler) DeletePost(ctx context.Context, input *pb.DeletePostRequest) (*pb.DeletePostResponse, error) {
+	// Get user uuid from bytes.
+	userID, err := uuid.FromBytes(input.Id)
+	if err != nil {
+		return &pb.DeletePostResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	// Delete post.
+	if err := h.service.Delete(ctx, userID); err != nil {
+		return &pb.DeletePostResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &pb.DeletePostResponse{}, nil
+}

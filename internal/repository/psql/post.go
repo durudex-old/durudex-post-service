@@ -43,3 +43,8 @@ func (r *PostRepository) Create(ctx context.Context, text string) (uuid.UUID, er
 func (r *PostRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error) {
 	return domain.Post{}, nil
 }
+
+// Deleting a post in postgres database.
+func (r *PostRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	return nil
+}
