@@ -42,7 +42,7 @@ func NewPostHandler(service service.Post) *PostHandler {
 
 // Creating a new post.
 func (h *PostHandler) CreatePost(ctx context.Context, input *pb.CreatePostRequest) (*pb.CreatePostResponse, error) {
-	id, err := h.service.CreatePost(ctx, input.Text)
+	id, err := h.service.Create(ctx, input.Text)
 	if err != nil {
 		return &pb.CreatePostResponse{}, status.Error(codes.Internal, err.Error())
 	}
@@ -58,8 +58,8 @@ func (h *PostHandler) GetPostByID(ctx context.Context, input *pb.GetPostByIDRequ
 		return &pb.GetPostByIDResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	// Get post.
-	post, err := h.service.GetPostByID(ctx, userID)
+	// Get post by id.
+	post, err := h.service.GetByID(ctx, userID)
 	if err != nil {
 		return &pb.GetPostByIDResponse{}, status.Error(codes.Internal, err.Error())
 	}

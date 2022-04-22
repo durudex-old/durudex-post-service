@@ -15,51 +15,36 @@
  * along with Durudex. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package service
+package repository
 
 import (
 	"context"
 
 	"github.com/durudex/durudex-post-service/internal/domain"
-	"github.com/durudex/durudex-post-service/internal/repository"
 
 	"github.com/gofrs/uuid"
 )
 
-// Post interface.
+// Post repository interface.
 type Post interface {
 	Create(ctx context.Context, text string) (uuid.UUID, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)
 }
 
-// Post service structure.
-type PostService struct{ repos repository.Post }
+// Post repository structure.
+type PostRepository struct{}
 
-// Creating a new post service.
-func NewPostService() *PostService {
-	return &PostService{}
+// Creating a new post repository.
+func NewPostRepository() *PostRepository {
+	return &PostRepository{}
 }
 
-// Creating a new post.
-func (s *PostService) Create(ctx context.Context, text string) (uuid.UUID, error) {
-	// TODO: Check length of text.
-
-	// Create a new post.
-	id, err := s.repos.Create(ctx, text)
-	if err != nil {
-		return uuid.Nil, err
-	}
-
-	return id, nil
+// Creating a new post in database.
+func (r *PostRepository) Create(ctx context.Context, text string) (uuid.UUID, error) {
+	return uuid.UUID{}, nil
 }
 
 // Getting a post by id.
-func (s *PostService) GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error) {
-	// Get post by id.
-	post, err := s.repos.GetByID(ctx, id)
-	if err != nil {
-		return domain.Post{}, err
-	}
-
-	return post, nil
+func (r *PostRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error) {
+	return domain.Post{}, nil
 }
