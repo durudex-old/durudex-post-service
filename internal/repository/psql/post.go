@@ -35,7 +35,11 @@ func NewPostRepository(psql dugopg.Native) *PostRepository {
 }
 
 // Creating a new post in postgres database.
-func (r *PostRepository) Create(ctx context.Context, text string) (uuid.UUID, error)
+func (r *PostRepository) Create(ctx context.Context, text string) (uuid.UUID, error) {
+	return uuid.Nil, nil
+}
 
 // Getting a post by id in postgres database.
-func (r *PostRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)
+func (r *PostRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error) {
+	return domain.Post{}, nil
+}
