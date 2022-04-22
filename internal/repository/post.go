@@ -20,6 +20,7 @@ package repository
 import (
 	"context"
 
+	"github.com/durudex/dugopg"
 	"github.com/durudex/durudex-post-service/internal/domain"
 	"github.com/durudex/durudex-post-service/internal/repository/psql"
 
@@ -36,8 +37,8 @@ type Post interface {
 type PostRepository struct{ psql *psql.PostRepository }
 
 // Creating a new post repository.
-func NewPostRepository(deps Deps) *PostRepository {
-	return &PostRepository{psql: psql.NewPostRepository(deps.Psql)}
+func NewPostRepository(conn dugopg.Native) *PostRepository {
+	return &PostRepository{psql: psql.NewPostRepository(conn)}
 }
 
 // Creating a new post in database.

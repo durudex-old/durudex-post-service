@@ -24,10 +24,7 @@ import (
 // Repository structure.
 type Repository struct{ Post }
 
-// Repository dependency.
-type Deps struct{ Psql dugopg.Native }
-
 // Creating a new repository.
-func NewRepository(deps Deps) *Repository {
-	return &Repository{Post: NewPostRepository(deps)}
+func NewRepository(psql dugopg.Native) *Repository {
+	return &Repository{Post: NewPostRepository(psql)}
 }
