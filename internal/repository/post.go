@@ -29,7 +29,7 @@ import (
 
 // Post repository interface.
 type Post interface {
-	Create(ctx context.Context, text string) (uuid.UUID, error)
+	Create(ctx context.Context, authorID uuid.UUID, text string) (uuid.UUID, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
@@ -43,8 +43,8 @@ func NewPostRepository(conn dugopg.Native) *PostRepository {
 }
 
 // Creating a new post in database.
-func (r *PostRepository) Create(ctx context.Context, text string) (uuid.UUID, error) {
-	return r.psql.Create(ctx, text)
+func (r *PostRepository) Create(ctx context.Context, authorID uuid.UUID, text string) (uuid.UUID, error) {
+	return r.psql.Create(ctx, authorID, text)
 }
 
 // Getting a post by id in database.

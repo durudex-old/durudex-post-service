@@ -28,7 +28,7 @@ import (
 
 // Post interface.
 type Post interface {
-	Create(ctx context.Context, text string) (uuid.UUID, error)
+	Create(ctx context.Context, authorID uuid.UUID, text string) (uuid.UUID, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
@@ -42,11 +42,11 @@ func NewPostService(repos repository.Post) *PostService {
 }
 
 // Creating a new post.
-func (s *PostService) Create(ctx context.Context, text string) (uuid.UUID, error) {
+func (s *PostService) Create(ctx context.Context, authorID uuid.UUID, text string) (uuid.UUID, error) {
 	// TODO: Check length of text.
 
 	// Create a new post.
-	id, err := s.repos.Create(ctx, text)
+	id, err := s.repos.Create(ctx, authorID, text)
 	if err != nil {
 		return uuid.Nil, err
 	}

@@ -58,3 +58,5 @@ Copyright © 2022 [Durudex](https://github.com/durudex). Released under the [GNU
 + [zerolog](https://github.com/rs/zerolog/blob/master/LICENSE)
 + [viper](https://github.com/spf13/viper/blob/master/LICENSE)
 + [uuid](https://github.com/gofrs/uuid/blob/master/LICENSE)
++ [dugopg](https://github.com/durudex/dugopg/blob/main/LICENSE)
++ [pgxmock](https://github.com/pashagolub/pgxmock/blob/master/LICENSE)

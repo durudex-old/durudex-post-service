@@ -42,7 +42,13 @@ func NewPostHandler(service service.Post) *PostHandler {
 
 // Creating a new post.
 func (h *PostHandler) CreatePost(ctx context.Context, input *pb.CreatePostRequest) (*pb.CreatePostResponse, error) {
-	id, err := h.service.Create(ctx, input.Text)
+	// Get author uuid from bytes.
+	authorID, err := uuid.FromBytes(input.AuthorId)
+	if err != nil {
+		return &pb.CreatePostResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	id, err := h.service.Create(ctx, authorID, input.Text)
 	if err != nil {
 		return &pb.CreatePostResponse{}, status.Error(codes.Internal, err.Error())
 	}
