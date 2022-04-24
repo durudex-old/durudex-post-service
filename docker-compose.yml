@@ -24,13 +24,15 @@ services:
       dockerfile: Dockerfile
     hostname: post.service.durudex.local
     ports:
-      - 8000:8000
+      - 8005:8005
     volumes:
       - ./.bin/:/root/
       - ./certs/:/root/certs/
       - ./configs/:/root/configs/
     env_file:
       - .env
+    depends_on:
+      - postgres
     networks:
       - durudex-backend
       - durudex-database

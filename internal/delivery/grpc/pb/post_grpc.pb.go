@@ -33,7 +33,7 @@ func NewPostServiceClient(cc grpc.ClientConnInterface) PostServiceClient {
 
 func (c *postServiceClient) CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*CreatePostResponse, error) {
 	out := new(CreatePostResponse)
-	err := c.cc.Invoke(ctx, "/PostService/CreatePost", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/durudex.PostService/CreatePost", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (c *postServiceClient) CreatePost(ctx context.Context, in *CreatePostReques
 
 func (c *postServiceClient) GetPostByID(ctx context.Context, in *GetPostByIDRequest, opts ...grpc.CallOption) (*GetPostByIDResponse, error) {
 	out := new(GetPostByIDResponse)
-	err := c.cc.Invoke(ctx, "/PostService/GetPostByID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/durudex.PostService/GetPostByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *postServiceClient) GetPostByID(ctx context.Context, in *GetPostByIDRequ
 
 func (c *postServiceClient) DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*DeletePostResponse, error) {
 	out := new(DeletePostResponse)
-	err := c.cc.Invoke(ctx, "/PostService/DeletePost", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/durudex.PostService/DeletePost", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func _PostService_CreatePost_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/PostService/CreatePost",
+		FullMethod: "/durudex.PostService/CreatePost",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PostServiceServer).CreatePost(ctx, req.(*CreatePostRequest))
@@ -122,7 +122,7 @@ func _PostService_GetPostByID_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/PostService/GetPostByID",
+		FullMethod: "/durudex.PostService/GetPostByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PostServiceServer).GetPostByID(ctx, req.(*GetPostByIDRequest))
@@ -140,7 +140,7 @@ func _PostService_DeletePost_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/PostService/DeletePost",
+		FullMethod: "/durudex.PostService/DeletePost",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PostServiceServer).DeletePost(ctx, req.(*DeletePostRequest))
@@ -152,7 +152,7 @@ func _PostService_DeletePost_Handler(srv interface{}, ctx context.Context, dec f
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var PostService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "PostService",
+	ServiceName: "durudex.PostService",
 	HandlerType: (*PostServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

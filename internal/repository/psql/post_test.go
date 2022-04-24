@@ -19,6 +19,7 @@ package psql
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -62,7 +63,7 @@ func TestPostRepository_Create(t *testing.T) {
 			args: args{authorID: uuid.UUID{}, text: "text"},
 			want: uuid.UUID{},
 			mockBehavior: func(args args, want uuid.UUID) {
-				mock.ExpectQuery(`INSERT INTO "user_post"`).
+				mock.ExpectQuery(fmt.Sprintf(`INSERT INTO "%s"`, postTable)).
 					WithArgs(args.authorID, args.text).
 					WillReturnRows(mock.NewRows([]string{"id"}).AddRow(want))
 			},
@@ -127,7 +128,7 @@ func TestPostRepository_GetByID(t *testing.T) {
 				rows := mock.NewRows([]string{"author_id", "text", "created_at", "updated_at"}).AddRow(
 					post.AuthorID, post.Text, post.CreatedAt, post.UpdatedAt)
 
-				mock.ExpectQuery(`SELECT (.+) FROM "user_post"`).
+				mock.ExpectQuery(fmt.Sprintf(`SELECT (.+) FROM "%s"`, postTable)).
 					WithArgs(args.id).
 					WillReturnRows(rows)
 			},
@@ -183,7 +184,7 @@ func TestPostRepository_Delete(t *testing.T) {
 			args:    args{id: uuid.UUID{}},
 			wantErr: false,
 			mockBehavior: func(args args) {
-				mock.ExpectExec(`DELETE FROM "user_post"`).
+				mock.ExpectExec(fmt.Sprintf(`DELETE FROM "%s"`, postTable)).
 					WithArgs(args.id).
 					WillReturnResult(pgxmock.NewResult("", 1))
 			},

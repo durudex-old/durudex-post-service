@@ -28,7 +28,7 @@ import (
 )
 
 // Post database tables.
-const postTable string = "user_post"
+const postTable string = "post"
 
 // Post postgres repository.
 type PostRepository struct{ psql dugopg.Native }
@@ -61,7 +61,7 @@ func (r *PostRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Post
 	post.ID = id
 
 	// Query for get post by id.
-	query := fmt.Sprintf(`SELECT "author_id", "text", "created_at", "updated_at", FROM "%s" WHERE "id"=$1`, postTable)
+	query := fmt.Sprintf(`SELECT "author_id", "text", "created_at", "updated_at" FROM "%s" WHERE "id"=$1`, postTable)
 
 	row := r.psql.QueryRow(ctx, query, id)
 
