@@ -19,6 +19,7 @@ package grpc
 
 import (
 	"context"
+	"time"
 
 	"github.com/durudex/durudex-post-service/internal/delivery/grpc/pb"
 	"github.com/durudex/durudex-post-service/internal/service"
@@ -74,8 +75,17 @@ func (h *PostHandler) GetPostByID(ctx context.Context, input *pb.GetPostByIDRequ
 		AuthorId:  post.AuthorID.Bytes(),
 		Text:      post.Text,
 		CreatedAt: timestamppb.New(post.CreatedAt),
-		UpdatedAt: timestamppb.New(*post.UpdatedAt),
+		UpdatedAt: checkOptionalTime(post.UpdatedAt),
 	}, nil
+}
+
+// TODO: delete or move to another file.
+func checkOptionalTime(time *time.Time) *timestamppb.Timestamp {
+	if time == nil {
+		return nil
+	}
+
+	return timestamppb.New(*time)
 }
 
 // Deleting a post.
