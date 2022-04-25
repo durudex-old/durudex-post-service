@@ -204,3 +204,58 @@ func TestPostRepository_Delete(t *testing.T) {
 		})
 	}
 }
+
+// Testing updating a post in postgres database.
+func TestPostRepository_Update(t *testing.T) {
+	// Creating a new mock connection.
+	mock, err := pgxmock.NewConn()
+	if err != nil {
+		t.Fatalf("error creating a new mock connection: %s", err.Error())
+	}
+	defer mock.Close(context.Background())
+
+	// Testing args.
+	type args struct {
+		id       uuid.UUID
+		authorID uuid.UUID
+		text     string
+	}
+
+	// Test bahavior.
+	type mockBehavior func(args args)
+
+	// Creating a new repository.
+	repos := NewPostRepository(mock)
+
+	// Tests structures.
+	tests := []struct {
+		name         string
+		args         args
+		wantErr      bool
+		mockBehavior mockBehavior
+	}{
+		{
+			name:    "OK",
+			args:    args{id: uuid.UUID{}, authorID: uuid.UUID{}, text: "text"},
+			wantErr: false,
+			mockBehavior: func(args args) {
+				mock.ExpectExec(fmt.Sprintf(`UPDATE "%s"`, postTable)).
+					WithArgs(args.text, args.id, args.authorID).
+					WillReturnResult(pgxmock.NewResult("", 1))
+			},
+		},
+	}
+
+	// Conducting tests in various structures.
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockBehavior(tt.args)
+
+			// Updating a post in postgres database.
+			err := repos.Update(context.Background(), tt.args.id, tt.args.authorID, tt.args.text)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("error updating post by id: %s", err.Error())
+			}
+		})
+	}
+}
