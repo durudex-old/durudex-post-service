@@ -60,3 +60,4 @@ Copyright © 2022 [Durudex](https://github.com/durudex). Released under the [GNU
 + [uuid](https://github.com/gofrs/uuid/blob/master/LICENSE)
 + [dugopg](https://github.com/durudex/dugopg/blob/main/LICENSE)
 + [pgxmock](https://github.com/pashagolub/pgxmock/blob/master/LICENSE)
++ [dugopb](https://github.com/durudex/dugopb/blob/main/LICENSE)

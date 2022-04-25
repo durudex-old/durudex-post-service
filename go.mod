@@ -3,13 +3,14 @@ module github.com/durudex/durudex-post-service
 go 1.18
 
 require (
+	github.com/durudex/dugopb v0.0.0-20220425140104-bf229217bf34
 	github.com/durudex/dugopg v0.0.0-20220408101215-11e1ac56058c
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/pashagolub/pgxmock v1.4.4
 	github.com/rs/zerolog v1.26.1
 	github.com/spf13/viper v1.10.1
 	google.golang.org/grpc v1.45.0
-	google.golang.org/protobuf v1.27.1
+	google.golang.org/protobuf v1.28.0
 )
 
 require (
