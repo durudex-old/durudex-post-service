@@ -32,7 +32,7 @@ type Post interface {
 	Create(ctx context.Context, authorID uuid.UUID, text string) (uuid.UUID, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)
 	Delete(ctx context.Context, id uuid.UUID) error
-	Update(ctx context.Context, id, authorID uuid.UUID, text string) error
+	Update(ctx context.Context, id uuid.UUID, text string) error
 }
 
 // Post repository structure.
@@ -59,6 +59,6 @@ func (r *PostRepository) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 // Updating a post in database.
-func (r *PostRepository) Update(ctx context.Context, id, authorID uuid.UUID, text string) error {
-	return r.psql.Update(ctx, id, authorID, text)
+func (r *PostRepository) Update(ctx context.Context, id uuid.UUID, text string) error {
+	return r.psql.Update(ctx, id, text)
 }

@@ -84,10 +84,10 @@ func (r *PostRepository) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 // Updating a post in postgres database.
-func (r *PostRepository) Update(ctx context.Context, id, authorID uuid.UUID, text string) error {
+func (r *PostRepository) Update(ctx context.Context, id uuid.UUID, text string) error {
 	// Query for update post by id.
-	query := fmt.Sprintf(`UPDATE "%s" SET "text"=$1 WHERE "id"=$2 AND "author_id"=$3`, postTable)
-	_, err := r.psql.Exec(ctx, query, text, id, authorID)
+	query := fmt.Sprintf(`UPDATE "%s" SET "text"=$1 WHERE "id"=$2`, postTable)
+	_, err := r.psql.Exec(ctx, query, text, id)
 
 	return err
 }

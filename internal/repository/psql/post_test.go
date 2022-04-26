@@ -216,9 +216,8 @@ func TestPostRepository_Update(t *testing.T) {
 
 	// Testing args.
 	type args struct {
-		id       uuid.UUID
-		authorID uuid.UUID
-		text     string
+		id   uuid.UUID
+		text string
 	}
 
 	// Test bahavior.
@@ -236,11 +235,11 @@ func TestPostRepository_Update(t *testing.T) {
 	}{
 		{
 			name:    "OK",
-			args:    args{id: uuid.UUID{}, authorID: uuid.UUID{}, text: "text"},
+			args:    args{id: uuid.UUID{}, text: "text"},
 			wantErr: false,
 			mockBehavior: func(args args) {
 				mock.ExpectExec(fmt.Sprintf(`UPDATE "%s"`, postTable)).
-					WithArgs(args.text, args.id, args.authorID).
+					WithArgs(args.text, args.id).
 					WillReturnResult(pgxmock.NewResult("", 1))
 			},
 		},
@@ -252,7 +251,7 @@ func TestPostRepository_Update(t *testing.T) {
 			tt.mockBehavior(tt.args)
 
 			// Updating a post in postgres database.
-			err := repos.Update(context.Background(), tt.args.id, tt.args.authorID, tt.args.text)
+			err := repos.Update(context.Background(), tt.args.id, tt.args.text)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("error updating post by id: %s", err.Error())
 			}
