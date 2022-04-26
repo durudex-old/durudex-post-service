@@ -93,3 +93,17 @@ func (h *PostHandler) DeletePost(ctx context.Context, input *pb.DeletePostReques
 
 	return &pb.DeletePostResponse{}, nil
 }
+
+// Updating a post.
+func (h *PostHandler) UpdatePost(ctx context.Context, input *pb.UpdatePostRequest) (*pb.UpdatePostResponse, error) {
+	postID, err := uuid.FromBytes(input.Id)
+	if err != nil {
+		return &pb.UpdatePostResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if err := h.service.Update(ctx, postID, input.Text); err != nil {
+		return &pb.UpdatePostResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &pb.UpdatePostResponse{}, nil
+}
