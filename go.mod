@@ -3,7 +3,7 @@ module github.com/durudex/durudex-post-service
 go 1.18
 
 require (
-	github.com/durudex/dugopb v0.0.0-20220425140104-bf229217bf34
+	github.com/durudex/dugopb v0.0.0-20220515113850-1a71150497b9
 	github.com/durudex/dugopg v0.0.0-20220408101215-11e1ac56058c
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/pashagolub/pgxmock v1.4.4
