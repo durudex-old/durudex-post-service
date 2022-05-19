@@ -15,12 +15,14 @@
  * along with Durudex. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package config
+package config_test
 
 import (
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/durudex/durudex-post-service/internal/config"
 )
 
 // Test initialize config.
@@ -41,27 +43,27 @@ func TestConfig_Init(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *Config
+		want    *config.Config
 		wantErr bool
 	}{
 		{
 			name: "OK",
 			args: args{env: env{configPath: "fixtures/main", postgresURL: "postgres://localhost:1"}},
-			want: &Config{
-				Server: ServerConfig{
-					Host: defaultServerHost,
-					Port: defaultServerPort,
-					TLS: TLSConfig{
-						Enable: defaultTLSEnable,
-						CACert: defaultTLSCACert,
-						Cert:   defaultTLSCert,
-						Key:    defaultTLSKey,
+			want: &config.Config{
+				GRPC: config.GRPCConfig{
+					Host: "post.service.durudex.local",
+					Port: "8005",
+					TLS: config.TLSConfig{
+						Enable: true,
+						CACert: "./certs/rootCA.pem",
+						Cert:   "./certs/post.service.durudex.local-cert.pem",
+						Key:    "./certs/post.service.durudex.local-key.pem",
 					},
 				},
-				Database: DatabaseConfig{
-					Postgres: PostgresConfig{
-						MaxConns: defaultDatabasePostgresMaxConns,
-						MinConns: defaultDatabasePostgresMinConns,
+				Database: config.DatabaseConfig{
+					Postgres: config.PostgresConfig{
+						MaxConns: 20,
+						MinConns: 5,
 						URL:      "postgres://localhost:1",
 					}},
 			},
@@ -74,8 +76,8 @@ func TestConfig_Init(t *testing.T) {
 			// Set environments configurations.
 			setEnv(tt.args.env)
 
-			// Initialize connfig.
-			got, err := Init()
+			// Initialize config.
+			got, err := config.Init()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("error initialize config: %s", err.Error())
 			}

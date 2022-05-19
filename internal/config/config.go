@@ -25,15 +25,17 @@ import (
 	"github.com/spf13/viper"
 )
 
+const defaultConfigPath string = "configs/main"
+
 type (
 	// Config variables.
 	Config struct {
-		Server   ServerConfig   // Server configuration.
-		Database DatabaseConfig // Database configuration.
+		GRPC     GRPCConfig
+		Database DatabaseConfig
 	}
 
-	// Server config variables.
-	ServerConfig struct {
+	// gRPC server config variables.
+	GRPCConfig struct {
 		Host string    `mapstructure:"host"`
 		Port string    `mapstructure:"port"`
 		TLS  TLSConfig `mapstructure:"tls"`
@@ -63,9 +65,6 @@ type (
 // Initialize config.
 func Init() (*Config, error) {
 	log.Debug().Msg("Initialize config...")
-
-	// Populate defaults config variables.
-	populateDefaults()
 
 	// Parsing specified when starting the config file.
 	if err := parseConfigFile(); err != nil {
@@ -115,11 +114,11 @@ func unmarshal(cfg *Config) error {
 	if err := viper.UnmarshalKey("database", &cfg.Database); err != nil {
 		return err
 	}
-	// Unmarshal server keys.
-	return viper.UnmarshalKey("server", &cfg.Server)
+	// Unmarshal gRPC server keys.
+	return viper.UnmarshalKey("grpc", &cfg.GRPC)
 }
 
-// Seting environment variables from .env file.
+// Setting environment variables from .env file.
 func setFromEnv(cfg *Config) {
 	log.Debug().Msg("Set from environment configurations...")
 
