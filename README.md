@@ -21,8 +21,7 @@ Service for working with posts.
 
 ### 💡 Prerequisites
 + [Go 1.18](https://golang.org/)
-+ [grpc](https://grpc.io/docs/languages/go/quickstart/)
-+ [golangci-lint](https://golangci-lint.run/usage/install/)
++ [Docker](https://www.docker.com/get-started/)
 
 ## ⚙️ Build & Run
 1) Create an `.env` file in the root directory and add the following values from `.env.example`:
@@ -36,8 +35,8 @@ CONFIG_PATH=configs/main
 # Postgres database variables:
 POSTGRES_URL=postgresql://admin:qwerty@post.postgres.durudex.local:5432/durudex
 ```
-2) Migrate the database using `make migrate-up`.
-3) Generate certificates, information can be found at [certs/README.md](certs/README.md)
+2) Set certificates, information can be found at [certs/README.md](certs/README.md).
+3) Migrate the database, information can be found at [schema/README.md](schema/README.md).
 
 Use `make run` to run and `make build` to build project.
 
@@ -51,13 +50,3 @@ If you want to say thank you and/or support the active development of [Durudex](
 
 ## ⚠️ License
 Copyright © 2022 [Durudex](https://github.com/durudex). Released under the [GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0.html) license.
-
-#### Third-party library licenses
-+ [grpc-go](https://github.com/grpc/grpc-go/blob/master/LICENSE)
-+ [protobuf](https://github.com/protocolbuffers/protobuf/blob/master/LICENSE)
-+ [zerolog](https://github.com/rs/zerolog/blob/master/LICENSE)
-+ [viper](https://github.com/spf13/viper/blob/master/LICENSE)
-+ [uuid](https://github.com/gofrs/uuid/blob/master/LICENSE)
-+ [dugopg](https://github.com/durudex/dugopg/blob/main/LICENSE)
-+ [pgxmock](https://github.com/pashagolub/pgxmock/blob/master/LICENSE)
-+ [dugopb](https://github.com/durudex/dugopb/blob/main/LICENSE)
