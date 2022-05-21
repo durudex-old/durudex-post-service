@@ -15,7 +15,7 @@
  * along with Durudex. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package psql
+package postgres_test
 
 import (
 	"context"
@@ -25,6 +25,8 @@ import (
 	"time"
 
 	"github.com/durudex/durudex-post-service/internal/domain"
+	"github.com/durudex/durudex-post-service/internal/repository/postgres"
+
 	"github.com/gofrs/uuid"
 	"github.com/pashagolub/pgxmock"
 )
@@ -44,11 +46,11 @@ func TestPostRepository_Create(t *testing.T) {
 		text     string
 	}
 
-	// Test bahavior.
+	// Test behavior.
 	type mockBehavior func(args args, id uuid.UUID)
 
 	// Creating a new repository.
-	repos := NewPostRepository(mock)
+	repos := postgres.NewPostRepository(mock)
 
 	// Tests structures.
 	tests := []struct {
@@ -63,7 +65,7 @@ func TestPostRepository_Create(t *testing.T) {
 			args: args{authorID: uuid.UUID{}, text: "text"},
 			want: uuid.UUID{},
 			mockBehavior: func(args args, want uuid.UUID) {
-				mock.ExpectQuery(fmt.Sprintf(`INSERT INTO "%s"`, postTable)).
+				mock.ExpectQuery(fmt.Sprintf(`INSERT INTO "%s"`, postgres.PostTable)).
 					WithArgs(args.authorID, args.text).
 					WillReturnRows(mock.NewRows([]string{"id"}).AddRow(want))
 			},
@@ -101,11 +103,11 @@ func TestPostRepository_GetByID(t *testing.T) {
 	// Testing args.
 	type args struct{ id uuid.UUID }
 
-	// Test bahavior.
+	// Test behavior.
 	type mockBehavior func(args args, user domain.Post)
 
 	// Creating a new repository.
-	repos := NewPostRepository(mock)
+	repos := postgres.NewPostRepository(mock)
 
 	// Tests structures.
 	tests := []struct {
@@ -128,7 +130,7 @@ func TestPostRepository_GetByID(t *testing.T) {
 				rows := mock.NewRows([]string{"author_id", "text", "created_at", "updated_at"}).AddRow(
 					post.AuthorID, post.Text, post.CreatedAt, post.UpdatedAt)
 
-				mock.ExpectQuery(fmt.Sprintf(`SELECT (.+) FROM "%s"`, postTable)).
+				mock.ExpectQuery(fmt.Sprintf(`SELECT (.+) FROM "%s"`, postgres.PostTable)).
 					WithArgs(args.id).
 					WillReturnRows(rows)
 			},
@@ -166,11 +168,11 @@ func TestPostRepository_Delete(t *testing.T) {
 	// Testing args.
 	type args struct{ id uuid.UUID }
 
-	// Test bahavior.
+	// Test behavior.
 	type mockBehavior func(args args)
 
 	// Creating a new repository.
-	repos := NewPostRepository(mock)
+	repos := postgres.NewPostRepository(mock)
 
 	// Tests structures.
 	tests := []struct {
@@ -184,7 +186,7 @@ func TestPostRepository_Delete(t *testing.T) {
 			args:    args{id: uuid.UUID{}},
 			wantErr: false,
 			mockBehavior: func(args args) {
-				mock.ExpectExec(fmt.Sprintf(`DELETE FROM "%s"`, postTable)).
+				mock.ExpectExec(fmt.Sprintf(`DELETE FROM "%s"`, postgres.PostTable)).
 					WithArgs(args.id).
 					WillReturnResult(pgxmock.NewResult("", 1))
 			},
@@ -220,11 +222,11 @@ func TestPostRepository_Update(t *testing.T) {
 		text string
 	}
 
-	// Test bahavior.
+	// Test behavior.
 	type mockBehavior func(args args)
 
 	// Creating a new repository.
-	repos := NewPostRepository(mock)
+	repos := postgres.NewPostRepository(mock)
 
 	// Tests structures.
 	tests := []struct {
@@ -238,7 +240,7 @@ func TestPostRepository_Update(t *testing.T) {
 			args:    args{id: uuid.UUID{}, text: "text"},
 			wantErr: false,
 			mockBehavior: func(args args) {
-				mock.ExpectExec(fmt.Sprintf(`UPDATE "%s"`, postTable)).
+				mock.ExpectExec(fmt.Sprintf(`UPDATE "%s"`, postgres.PostTable)).
 					WithArgs(args.text, args.id).
 					WillReturnResult(pgxmock.NewResult("", 1))
 			},

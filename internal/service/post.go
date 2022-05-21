@@ -21,7 +21,7 @@ import (
 	"context"
 
 	"github.com/durudex/durudex-post-service/internal/domain"
-	"github.com/durudex/durudex-post-service/internal/repository"
+	"github.com/durudex/durudex-post-service/internal/repository/postgres"
 
 	"github.com/gofrs/uuid"
 )
@@ -35,10 +35,10 @@ type Post interface {
 }
 
 // Post service structure.
-type PostService struct{ repos repository.Post }
+type PostService struct{ repos postgres.Post }
 
 // Creating a new post service.
-func NewPostService(repos repository.Post) *PostService {
+func NewPostService(repos postgres.Post) *PostService {
 	return &PostService{repos: repos}
 }
 

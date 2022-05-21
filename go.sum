@@ -26,8 +26,6 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/durudex/dugopb v0.0.0-20220515113850-1a71150497b9 h1:2MFGP7/I79j4dxtZyICOFcmtL24mqlBBvrC0cnrJqPI=
 github.com/durudex/dugopb v0.0.0-20220515113850-1a71150497b9/go.mod h1:UupXbRNlvMieUZ2LdikpUW4I/8/w0w7cSDGfWXU2w8I=
-github.com/durudex/dugopg v0.0.0-20220408101215-11e1ac56058c h1:SHPklvTXnPx+Yj6PENYhwPKtGaAbsVtGHhR27sfJc6w=
-github.com/durudex/dugopg v0.0.0-20220408101215-11e1ac56058c/go.mod h1:3h9TvCVmmNXQiZk0oKNmiA7tZ51qmfhaqYPuvMzh2hk=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1mIlRU8Am5FuJP05cCM98=
