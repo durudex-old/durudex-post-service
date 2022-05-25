@@ -48,7 +48,7 @@ services:
     ports:
       - 5434:5432
     volumes:
-      - durudex:/var/lib/postgresql/data
+      - durudex-post:/var/lib/postgresql/data
     networks:
       - durudex-database
 
@@ -61,5 +61,5 @@ networks:
     name: durudex-database
 
 volumes:
-  durudex:
-    name: durudex
+  durudex-post:
+    name: durudex-post
