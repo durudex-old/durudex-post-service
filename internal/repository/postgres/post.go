@@ -19,12 +19,14 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/durudex/durudex-post-service/internal/domain"
 	"github.com/durudex/durudex-post-service/pkg/database/postgres"
 
 	"github.com/gofrs/uuid"
+	"github.com/jackc/pgx/v4"
 )
 
 // Post table name.
@@ -76,7 +78,11 @@ func (r *PostRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Post
 	// Scanning query row.
 	err := row.Scan(&post.AuthorID, &post.Text, &post.CreatedAt, &post.UpdatedAt)
 	if err != nil {
-		return domain.Post{}, err
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.Post{}, &domain.Error{Code: domain.CodeNotFound, Message: "User not found"}
+		}
+
+		return domain.Post{}, &domain.Error{Code: domain.CodeInternal, Message: "Internal Server Error"}
 	}
 
 	return post, nil
