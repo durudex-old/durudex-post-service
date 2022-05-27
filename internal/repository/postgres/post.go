@@ -36,8 +36,8 @@ const PostTable string = "post"
 type Post interface {
 	Create(ctx context.Context, authorID uuid.UUID, text string) (uuid.UUID, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)
-	Delete(ctx context.Context, id uuid.UUID) error
-	Update(ctx context.Context, id uuid.UUID, text string) error
+	Delete(ctx context.Context, id, authorID uuid.UUID) error
+	Update(ctx context.Context, id, authorID uuid.UUID, text string) error
 }
 
 // Post repository structure.
@@ -89,19 +89,19 @@ func (r *PostRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Post
 }
 
 // Deleting a post in postgres database.
-func (r *PostRepository) Delete(ctx context.Context, id uuid.UUID) error {
+func (r *PostRepository) Delete(ctx context.Context, id, authorID uuid.UUID) error {
 	// Query for delete post by id.
-	query := fmt.Sprintf(`DELETE FROM "%s" WHERE id=$1`, PostTable)
-	_, err := r.psql.Exec(ctx, query, id)
+	query := fmt.Sprintf(`DELETE FROM "%s" WHERE id=$1 AND author_id=$2`, PostTable)
+	_, err := r.psql.Exec(ctx, query, id, authorID)
 
 	return err
 }
 
 // Updating a post in postgres database.
-func (r *PostRepository) Update(ctx context.Context, id uuid.UUID, text string) error {
+func (r *PostRepository) Update(ctx context.Context, id, authorID uuid.UUID, text string) error {
 	// Query for update post by id.
-	query := fmt.Sprintf(`UPDATE "%s" SET "text"=$1 WHERE "id"=$2`, PostTable)
-	_, err := r.psql.Exec(ctx, query, text, id)
+	query := fmt.Sprintf(`UPDATE "%s" SET text=$1, updated_at=now() WHERE "id"=$2 AND author_id=$3`, PostTable)
+	_, err := r.psql.Exec(ctx, query, text, id, authorID)
 
 	return err
 }

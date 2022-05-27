@@ -30,8 +30,8 @@ import (
 type Post interface {
 	Create(ctx context.Context, authorID uuid.UUID, text string) (uuid.UUID, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)
-	Delete(ctx context.Context, id uuid.UUID) error
-	Update(ctx context.Context, id uuid.UUID, text string) error
+	Delete(ctx context.Context, id, authorID uuid.UUID) error
+	Update(ctx context.Context, id, authorID uuid.UUID, text string) error
 }
 
 // Post service structure.
@@ -67,13 +67,13 @@ func (s *PostService) GetByID(ctx context.Context, id uuid.UUID) (domain.Post, e
 }
 
 // Deleting a post.
-func (s *PostService) Delete(ctx context.Context, id uuid.UUID) error {
-	return s.repos.Delete(ctx, id)
+func (s *PostService) Delete(ctx context.Context, id, authorID uuid.UUID) error {
+	return s.repos.Delete(ctx, id, authorID)
 }
 
 // Updating a post.
-func (s *PostService) Update(ctx context.Context, id uuid.UUID, text string) error {
+func (s *PostService) Update(ctx context.Context, id, authorID uuid.UUID, text string) error {
 	// TODO: Check length of text.
 
-	return s.repos.Update(ctx, id, text)
+	return s.repos.Update(ctx, id, authorID, text)
 }

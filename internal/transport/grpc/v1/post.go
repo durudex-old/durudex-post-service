@@ -88,7 +88,7 @@ func (h *PostHandler) DeletePost(ctx context.Context, input *v1.DeletePostReques
 	}
 
 	// Deleting post.
-	err = h.service.Delete(ctx, id)
+	err = h.service.Delete(ctx, id, uuid.FromBytesOrNil(input.AuthorId))
 	if err != nil {
 		return &v1.DeletePostResponse{}, err
 	}
@@ -105,7 +105,7 @@ func (h *PostHandler) UpdatePost(ctx context.Context, input *v1.UpdatePostReques
 	}
 
 	// Updating post.
-	err = h.service.Update(ctx, id, input.Text)
+	err = h.service.Update(ctx, id, uuid.FromBytesOrNil(input.AuthorId), input.Text)
 	if err != nil {
 		return &v1.UpdatePostResponse{}, err
 	}

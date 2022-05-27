@@ -166,7 +166,7 @@ func TestPostRepository_Delete(t *testing.T) {
 	defer mock.Close(context.Background())
 
 	// Testing args.
-	type args struct{ id uuid.UUID }
+	type args struct{ id, authorId uuid.UUID }
 
 	// Test behavior.
 	type mockBehavior func(args args)
@@ -183,11 +183,11 @@ func TestPostRepository_Delete(t *testing.T) {
 	}{
 		{
 			name:    "OK",
-			args:    args{id: uuid.UUID{}},
+			args:    args{id: uuid.UUID{}, authorId: uuid.UUID{}},
 			wantErr: false,
 			mockBehavior: func(args args) {
 				mock.ExpectExec(fmt.Sprintf(`DELETE FROM "%s"`, postgres.PostTable)).
-					WithArgs(args.id).
+					WithArgs(args.id, args.authorId).
 					WillReturnResult(pgxmock.NewResult("", 1))
 			},
 		},
@@ -199,7 +199,7 @@ func TestPostRepository_Delete(t *testing.T) {
 			tt.mockBehavior(tt.args)
 
 			// Deleting a post in postgres database.
-			err := repos.Delete(context.Background(), tt.args.id)
+			err := repos.Delete(context.Background(), tt.args.id, tt.args.authorId)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("error deleting post by id: %s", err.Error())
 			}
@@ -218,8 +218,9 @@ func TestPostRepository_Update(t *testing.T) {
 
 	// Testing args.
 	type args struct {
-		id   uuid.UUID
-		text string
+		id       uuid.UUID
+		authorId uuid.UUID
+		text     string
 	}
 
 	// Test behavior.
@@ -237,11 +238,11 @@ func TestPostRepository_Update(t *testing.T) {
 	}{
 		{
 			name:    "OK",
-			args:    args{id: uuid.UUID{}, text: "text"},
+			args:    args{id: uuid.UUID{}, authorId: uuid.UUID{}, text: "text"},
 			wantErr: false,
 			mockBehavior: func(args args) {
 				mock.ExpectExec(fmt.Sprintf(`UPDATE "%s"`, postgres.PostTable)).
-					WithArgs(args.text, args.id).
+					WithArgs(args.text, args.id, args.authorId).
 					WillReturnResult(pgxmock.NewResult("", 1))
 			},
 		},
@@ -253,7 +254,7 @@ func TestPostRepository_Update(t *testing.T) {
 			tt.mockBehavior(tt.args)
 
 			// Updating a post in postgres database.
-			err := repos.Update(context.Background(), tt.args.id, tt.args.text)
+			err := repos.Update(context.Background(), tt.args.id, tt.args.authorId, tt.args.text)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("error updating post by id: %s", err.Error())
 			}
