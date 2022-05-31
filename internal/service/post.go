@@ -28,10 +28,10 @@ import (
 
 // Post interface.
 type Post interface {
-	Create(ctx context.Context, authorID uuid.UUID, text string) (uuid.UUID, error)
+	Create(ctx context.Context, post domain.Post) (uuid.UUID, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)
 	Delete(ctx context.Context, id, authorID uuid.UUID) error
-	Update(ctx context.Context, id, authorID uuid.UUID, text string) error
+	Update(ctx context.Context, post domain.Post) error
 }
 
 // Post service structure.
@@ -43,11 +43,14 @@ func NewPostService(repos postgres.Post) *PostService {
 }
 
 // Creating a new post.
-func (s *PostService) Create(ctx context.Context, authorID uuid.UUID, text string) (uuid.UUID, error) {
-	// TODO: Check length of text.
+func (s *PostService) Create(ctx context.Context, post domain.Post) (uuid.UUID, error) {
+	// Validate a post.
+	if err := post.Validate(); err != nil {
+		return uuid.Nil, err
+	}
 
 	// Create a new post.
-	id, err := s.repos.Create(ctx, authorID, text)
+	id, err := s.repos.Create(ctx, post)
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -72,8 +75,11 @@ func (s *PostService) Delete(ctx context.Context, id, authorID uuid.UUID) error 
 }
 
 // Updating a post.
-func (s *PostService) Update(ctx context.Context, id, authorID uuid.UUID, text string) error {
-	// TODO: Check length of text.
+func (s *PostService) Update(ctx context.Context, post domain.Post) error {
+	// Validate a post.
+	if err := post.Validate(); err != nil {
+		return err
+	}
 
-	return s.repos.Update(ctx, id, authorID, text)
+	return s.repos.Update(ctx, post)
 }

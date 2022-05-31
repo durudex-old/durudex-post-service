@@ -34,10 +34,10 @@ const PostTable string = "post"
 
 // Post repository interface.
 type Post interface {
-	Create(ctx context.Context, authorID uuid.UUID, text string) (uuid.UUID, error)
+	Create(ctx context.Context, post domain.Post) (uuid.UUID, error)
 	GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)
 	Delete(ctx context.Context, id, authorID uuid.UUID) error
-	Update(ctx context.Context, id, authorID uuid.UUID, text string) error
+	Update(ctx context.Context, post domain.Post) error
 }
 
 // Post repository structure.
@@ -49,14 +49,14 @@ func NewPostRepository(psql postgres.Postgres) *PostRepository {
 }
 
 // Creating a new post in postgres database.
-func (r *PostRepository) Create(ctx context.Context, authorID uuid.UUID, text string) (uuid.UUID, error) {
+func (r *PostRepository) Create(ctx context.Context, post domain.Post) (uuid.UUID, error) {
 	var id uuid.UUID
 
 	// Query to create post.
 	query := fmt.Sprintf(`INSERT INTO "%s" (author_id, text) VALUES ($1, $2) RETURNING "id"`, PostTable)
 
 	// Scan post id.
-	row := r.psql.QueryRow(ctx, query, authorID, text)
+	row := r.psql.QueryRow(ctx, query, post.AuthorID, post.Text)
 	if err := row.Scan(&id); err != nil {
 		return uuid.Nil, err
 	}
@@ -98,10 +98,10 @@ func (r *PostRepository) Delete(ctx context.Context, id, authorID uuid.UUID) err
 }
 
 // Updating a post in postgres database.
-func (r *PostRepository) Update(ctx context.Context, id, authorID uuid.UUID, text string) error {
+func (r *PostRepository) Update(ctx context.Context, post domain.Post) error {
 	// Query for update post by id.
 	query := fmt.Sprintf(`UPDATE "%s" SET text=$1, updated_at=now() WHERE "id"=$2 AND author_id=$3`, PostTable)
-	_, err := r.psql.Exec(ctx, query, text, id, authorID)
+	_, err := r.psql.Exec(ctx, query, post.Text, post.ID, post.AuthorID)
 
 	return err
 }

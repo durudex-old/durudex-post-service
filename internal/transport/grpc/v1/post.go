@@ -21,6 +21,7 @@ import (
 	"context"
 
 	"github.com/durudex/dugopb/type/timestamp"
+	"github.com/durudex/durudex-post-service/internal/domain"
 	"github.com/durudex/durudex-post-service/internal/service"
 	v1 "github.com/durudex/durudex-post-service/pkg/pb/durudex/v1"
 
@@ -49,7 +50,10 @@ func (h *PostHandler) CreatePost(ctx context.Context, input *v1.CreatePostReques
 	}
 
 	// Create a new post.
-	id, err := h.service.Create(ctx, authorID, input.Text)
+	id, err := h.service.Create(ctx, domain.Post{
+		AuthorID: authorID,
+		Text:     input.Text,
+	})
 	if err != nil {
 		return &v1.CreatePostResponse{}, err
 	}
@@ -105,7 +109,11 @@ func (h *PostHandler) UpdatePost(ctx context.Context, input *v1.UpdatePostReques
 	}
 
 	// Updating post.
-	err = h.service.Update(ctx, id, uuid.FromBytesOrNil(input.AuthorId), input.Text)
+	err = h.service.Update(ctx, domain.Post{
+		ID:       id,
+		AuthorID: uuid.FromBytesOrNil(input.AuthorId),
+		Text:     input.Text,
+	})
 	if err != nil {
 		return &v1.UpdatePostResponse{}, err
 	}

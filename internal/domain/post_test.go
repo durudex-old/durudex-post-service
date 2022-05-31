@@ -17,27 +17,37 @@
 
 package domain
 
-import (
-	"time"
+import "testing"
 
-	"github.com/gofrs/uuid"
-)
+// Testing validate a post.
+func TestPost_Validate(t *testing.T) {
+	// Testing args.
+	type args struct{ text string }
 
-// Post structure.
-type Post struct {
-	ID        uuid.UUID
-	AuthorID  uuid.UUID
-	Text      string
-	CreatedAt time.Time
-	UpdatedAt *time.Time
-}
-
-// Validate post.
-func (p *Post) Validate() error {
-	// Check post text length.
-	if len(p.Text) > 500 {
-		return &Error{Code: CodeInvalidArgument, Message: "Text is too long"}
+	// Tests structures.
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "OK",
+			args:    args{text: "Hello world!"},
+			wantErr: false,
+		},
 	}
 
-	return nil
+	// Conducting tests in various structures.
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Creating a new post.
+			post := Post{Text: tt.args.text}
+
+			// Validate post.
+			err := post.Validate()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("error validation post: %s", err.Error())
+			}
+		})
+	}
 }
