@@ -33,7 +33,7 @@ type Post struct {
 }
 
 // Validate post.
-func (p *Post) Validate() error {
+func (p Post) Validate() error {
 	// Check post text length.
 	if len(p.Text) > 500 {
 		return &Error{Code: CodeInvalidArgument, Message: "Text is too long"}
