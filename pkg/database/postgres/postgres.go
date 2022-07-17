@@ -1,16 +1,16 @@
 /*
  * Copyright © 2022 Durudex
-
+ *
  * This file is part of Durudex: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
-
+ *
  * Durudex is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
-
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with Durudex. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -22,8 +22,6 @@ import (
 	"os"
 
 	"github.com/jackc/pgconn"
-	"github.com/jackc/pgtype"
-	pgtypeuuid "github.com/jackc/pgtype/ext/gofrs-uuid"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/log/zerologadapter"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -56,17 +54,6 @@ func (c *PostgresConfig) Configure(cfg *pgxpool.Config) {
 	// Set max and min postgres driver connections.
 	cfg.MaxConns = c.MaxConns
 	cfg.MinConns = c.MinConns
-
-	cfg.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
-		// Register custom types.
-		conn.ConnInfo().RegisterDataType(pgtype.DataType{
-			Value: &pgtypeuuid.UUID{},
-			Name:  "uuid",
-			OID:   pgtype.UUIDOID,
-		})
-
-		return nil
-	}
 }
 
 // Creating a new postgres pool connection.
