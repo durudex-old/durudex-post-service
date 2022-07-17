@@ -24,8 +24,8 @@ import (
 
 	"github.com/durudex/durudex-post-service/internal/domain"
 	"github.com/durudex/durudex-post-service/pkg/database/postgres"
+	"github.com/segmentio/ksuid"
 
-	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v4"
 )
 
@@ -34,9 +34,9 @@ const PostTable string = "post"
 
 // Post repository interface.
 type Post interface {
-	Create(ctx context.Context, post domain.Post) (uuid.UUID, error)
-	GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)
-	Delete(ctx context.Context, id, authorID uuid.UUID) error
+	Create(ctx context.Context, post domain.Post) (ksuid.KSUID, error)
+	GetByID(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
+	Delete(ctx context.Context, id, authorID ksuid.KSUID) error
 	Update(ctx context.Context, post domain.Post) error
 }
 
@@ -49,35 +49,32 @@ func NewPostRepository(psql postgres.Postgres) *PostRepository {
 }
 
 // Creating a new post in postgres database.
-func (r *PostRepository) Create(ctx context.Context, post domain.Post) (uuid.UUID, error) {
-	var id uuid.UUID
+func (r *PostRepository) Create(ctx context.Context, post domain.Post) (ksuid.KSUID, error) {
+	var id string
 
 	// Query to create post.
-	query := fmt.Sprintf(`INSERT INTO "%s" (author_id, text) VALUES ($1, $2) RETURNING "id"`, PostTable)
+	query := fmt.Sprintf(`INSERT INTO "%s" (id, author_id, text) VALUES ($1, $2, $3) RETURNING "id"`, PostTable)
 
 	// Scan post id.
-	row := r.psql.QueryRow(ctx, query, post.AuthorID, post.Text)
+	row := r.psql.QueryRow(ctx, query, post.Id.String(), post.AuthorId.String(), post.Text)
 	if err := row.Scan(&id); err != nil {
-		return uuid.Nil, err
+		return ksuid.Nil, err
 	}
 
-	return id, nil
+	return ksuid.Parse(id)
 }
 
 // Getting a post by id in postgres database.
-func (r *PostRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error) {
+func (r *PostRepository) GetByID(ctx context.Context, id ksuid.KSUID) (domain.Post, error) {
 	var post domain.Post
 
-	post.ID = id
-
 	// Query for get post by id.
-	query := fmt.Sprintf(`SELECT "author_id", "text", "created_at", "updated_at" FROM "%s" WHERE "id"=$1`, PostTable)
+	query := fmt.Sprintf(`SELECT "author_id", "text", "updated_at" FROM "%s" WHERE "id"=$1`, PostTable)
 
-	row := r.psql.QueryRow(ctx, query, id)
+	row := r.psql.QueryRow(ctx, query, id.String())
 
 	// Scanning query row.
-	err := row.Scan(&post.AuthorID, &post.Text, &post.CreatedAt, &post.UpdatedAt)
-	if err != nil {
+	if err := row.Scan(&post.AuthorId, &post.Text, &post.UpdatedAt); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return domain.Post{}, &domain.Error{Code: domain.CodeNotFound, Message: "User not found"}
 		}
@@ -89,10 +86,10 @@ func (r *PostRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Post
 }
 
 // Deleting a post in postgres database.
-func (r *PostRepository) Delete(ctx context.Context, id, authorID uuid.UUID) error {
+func (r *PostRepository) Delete(ctx context.Context, id, authorID ksuid.KSUID) error {
 	// Query for delete post by id.
 	query := fmt.Sprintf(`DELETE FROM "%s" WHERE id=$1 AND author_id=$2`, PostTable)
-	_, err := r.psql.Exec(ctx, query, id, authorID)
+	_, err := r.psql.Exec(ctx, query, id.String(), authorID.String())
 
 	return err
 }
@@ -101,7 +98,7 @@ func (r *PostRepository) Delete(ctx context.Context, id, authorID uuid.UUID) err
 func (r *PostRepository) Update(ctx context.Context, post domain.Post) error {
 	// Query for update post by id.
 	query := fmt.Sprintf(`UPDATE "%s" SET text=$1, updated_at=now() WHERE "id"=$2 AND author_id=$3`, PostTable)
-	_, err := r.psql.Exec(ctx, query, post.Text, post.ID, post.AuthorID)
+	_, err := r.psql.Exec(ctx, query, post.Text, post.Id.String(), post.AuthorId.String())
 
 	return err
 }

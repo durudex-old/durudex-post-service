@@ -22,13 +22,12 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/durudex/durudex-post-service/internal/domain"
 	"github.com/durudex/durudex-post-service/internal/repository/postgres"
 
-	"github.com/gofrs/uuid"
 	"github.com/pashagolub/pgxmock"
+	"github.com/segmentio/ksuid"
 )
 
 // Testing creating a new post in postgres database.
@@ -44,7 +43,7 @@ func TestPostRepository_Create(t *testing.T) {
 	type args struct{ post domain.Post }
 
 	// Test behavior.
-	type mockBehavior func(args args, id uuid.UUID)
+	type mockBehavior func(args args, id ksuid.KSUID)
 
 	// Creating a new repository.
 	repos := postgres.NewPostRepository(mock)
@@ -53,18 +52,18 @@ func TestPostRepository_Create(t *testing.T) {
 	tests := []struct {
 		name         string
 		args         args
-		want         uuid.UUID
+		want         ksuid.KSUID
 		wantErr      bool
 		mockBehavior mockBehavior
 	}{
 		{
 			name: "OK",
-			args: args{post: domain.Post{AuthorID: uuid.UUID{}, Text: "text"}},
-			want: uuid.UUID{},
-			mockBehavior: func(args args, want uuid.UUID) {
+			args: args{post: domain.Post{AuthorId: ksuid.New(), Text: "text"}},
+			want: ksuid.New(),
+			mockBehavior: func(args args, want ksuid.KSUID) {
 				mock.ExpectQuery(fmt.Sprintf(`INSERT INTO "%s"`, postgres.PostTable)).
-					WithArgs(args.post.AuthorID, args.post.Text).
-					WillReturnRows(mock.NewRows([]string{"id"}).AddRow(want))
+					WithArgs(args.post.Id.String(), args.post.AuthorId.String(), args.post.Text).
+					WillReturnRows(mock.NewRows([]string{"id"}).AddRow(want.String()))
 			},
 		},
 	}
@@ -98,10 +97,10 @@ func TestPostRepository_GetByID(t *testing.T) {
 	defer mock.Close(context.Background())
 
 	// Testing args.
-	type args struct{ id uuid.UUID }
+	type args struct{ id ksuid.KSUID }
 
 	// Test behavior.
-	type mockBehavior func(args args, user domain.Post)
+	type mockBehavior func(args args, post domain.Post)
 
 	// Creating a new repository.
 	repos := postgres.NewPostRepository(mock)
@@ -116,19 +115,18 @@ func TestPostRepository_GetByID(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			args: args{id: uuid.UUID{}},
+			args: args{id: ksuid.New()},
 			want: domain.Post{
-				AuthorID:  uuid.UUID{},
+				AuthorId:  ksuid.New(),
 				Text:      "text",
-				CreatedAt: time.Now(),
 				UpdatedAt: nil,
 			},
 			mockBehavior: func(args args, post domain.Post) {
-				rows := mock.NewRows([]string{"author_id", "text", "created_at", "updated_at"}).AddRow(
-					post.AuthorID, post.Text, post.CreatedAt, post.UpdatedAt)
+				rows := mock.NewRows([]string{"author_id", "text", "updated_at"}).AddRow(
+					post.AuthorId, post.Text, post.UpdatedAt)
 
 				mock.ExpectQuery(fmt.Sprintf(`SELECT (.+) FROM "%s"`, postgres.PostTable)).
-					WithArgs(args.id).
+					WithArgs(args.id.String()).
 					WillReturnRows(rows)
 			},
 		},
@@ -163,7 +161,7 @@ func TestPostRepository_Delete(t *testing.T) {
 	defer mock.Close(context.Background())
 
 	// Testing args.
-	type args struct{ id, authorId uuid.UUID }
+	type args struct{ id, authorId ksuid.KSUID }
 
 	// Test behavior.
 	type mockBehavior func(args args)
@@ -180,11 +178,11 @@ func TestPostRepository_Delete(t *testing.T) {
 	}{
 		{
 			name:    "OK",
-			args:    args{id: uuid.UUID{}, authorId: uuid.UUID{}},
+			args:    args{id: ksuid.New(), authorId: ksuid.New()},
 			wantErr: false,
 			mockBehavior: func(args args) {
 				mock.ExpectExec(fmt.Sprintf(`DELETE FROM "%s"`, postgres.PostTable)).
-					WithArgs(args.id, args.authorId).
+					WithArgs(args.id.String(), args.authorId.String()).
 					WillReturnResult(pgxmock.NewResult("", 1))
 			},
 		},
@@ -231,11 +229,11 @@ func TestPostRepository_Update(t *testing.T) {
 	}{
 		{
 			name:    "OK",
-			args:    args{post: domain.Post{ID: uuid.UUID{}, AuthorID: uuid.UUID{}, Text: "text"}},
+			args:    args{post: domain.Post{Id: ksuid.New(), AuthorId: ksuid.New(), Text: "text"}},
 			wantErr: false,
 			mockBehavior: func(args args) {
 				mock.ExpectExec(fmt.Sprintf(`UPDATE "%s"`, postgres.PostTable)).
-					WithArgs(args.post.Text, args.post.ID, args.post.AuthorID).
+					WithArgs(args.post.Text, args.post.Id.String(), args.post.AuthorId.String()).
 					WillReturnResult(pgxmock.NewResult("", 1))
 			},
 		},

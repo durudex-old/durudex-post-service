@@ -4,12 +4,12 @@ go 1.18
 
 require (
 	github.com/durudex/dugopb v0.0.0-20220515113850-1a71150497b9
-	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/jackc/pgconn v1.11.0
 	github.com/jackc/pgtype v1.10.0
 	github.com/jackc/pgx/v4 v4.15.0
 	github.com/pashagolub/pgxmock v1.4.4
 	github.com/rs/zerolog v1.26.1
+	github.com/segmentio/ksuid v1.0.4
 	github.com/spf13/viper v1.10.1
 	google.golang.org/grpc v1.45.0
 	google.golang.org/protobuf v1.28.0
@@ -17,6 +17,7 @@ require (
 
 require (
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
+	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect

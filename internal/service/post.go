@@ -22,15 +22,14 @@ import (
 
 	"github.com/durudex/durudex-post-service/internal/domain"
 	"github.com/durudex/durudex-post-service/internal/repository/postgres"
-
-	"github.com/gofrs/uuid"
+	"github.com/segmentio/ksuid"
 )
 
 // Post interface.
 type Post interface {
-	Create(ctx context.Context, post domain.Post) (uuid.UUID, error)
-	GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error)
-	Delete(ctx context.Context, id, authorID uuid.UUID) error
+	Create(ctx context.Context, post domain.Post) (ksuid.KSUID, error)
+	GetByID(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
+	Delete(ctx context.Context, id, authorID ksuid.KSUID) error
 	Update(ctx context.Context, post domain.Post) error
 }
 
@@ -43,23 +42,23 @@ func NewPostService(repos postgres.Post) *PostService {
 }
 
 // Creating a new post.
-func (s *PostService) Create(ctx context.Context, post domain.Post) (uuid.UUID, error) {
+func (s *PostService) Create(ctx context.Context, post domain.Post) (ksuid.KSUID, error) {
 	// Validate a post.
 	if err := post.Validate(); err != nil {
-		return uuid.Nil, err
+		return ksuid.Nil, err
 	}
 
 	// Create a new post.
 	id, err := s.repos.Create(ctx, post)
 	if err != nil {
-		return uuid.Nil, err
+		return ksuid.Nil, err
 	}
 
 	return id, nil
 }
 
 // Getting a post by id.
-func (s *PostService) GetByID(ctx context.Context, id uuid.UUID) (domain.Post, error) {
+func (s *PostService) GetByID(ctx context.Context, id ksuid.KSUID) (domain.Post, error) {
 	// Get post by id.
 	post, err := s.repos.GetByID(ctx, id)
 	if err != nil {
@@ -70,7 +69,7 @@ func (s *PostService) GetByID(ctx context.Context, id uuid.UUID) (domain.Post, e
 }
 
 // Deleting a post.
-func (s *PostService) Delete(ctx context.Context, id, authorID uuid.UUID) error {
+func (s *PostService) Delete(ctx context.Context, id, authorID ksuid.KSUID) error {
 	return s.repos.Delete(ctx, id, authorID)
 }
 

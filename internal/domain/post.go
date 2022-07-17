@@ -20,15 +20,14 @@ package domain
 import (
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/segmentio/ksuid"
 )
 
 // Post structure.
 type Post struct {
-	ID        uuid.UUID
-	AuthorID  uuid.UUID
+	Id        ksuid.KSUID
+	AuthorId  ksuid.KSUID
 	Text      string
-	CreatedAt time.Time
 	UpdatedAt *time.Time
 }
 
