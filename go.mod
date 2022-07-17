@@ -5,7 +5,6 @@ go 1.18
 require (
 	github.com/durudex/dugopb v0.0.0-20220515113850-1a71150497b9
 	github.com/jackc/pgconn v1.11.0
-	github.com/jackc/pgtype v1.10.0
 	github.com/jackc/pgx/v4 v4.15.0
 	github.com/pashagolub/pgxmock v1.4.4
 	github.com/rs/zerolog v1.26.1
@@ -25,6 +24,7 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgproto3/v2 v2.2.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
+	github.com/jackc/pgtype v1.10.0 // indirect
 	github.com/jackc/puddle v1.2.1 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
