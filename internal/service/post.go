@@ -22,6 +22,7 @@ import (
 
 	"github.com/durudex/durudex-post-service/internal/domain"
 	"github.com/durudex/durudex-post-service/internal/repository/postgres"
+
 	"github.com/segmentio/ksuid"
 )
 
@@ -29,7 +30,8 @@ import (
 type Post interface {
 	Create(ctx context.Context, post domain.Post) (ksuid.KSUID, error)
 	GetByID(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
-	Delete(ctx context.Context, id, authorID ksuid.KSUID) error
+	GetAuthorPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error)
+	Delete(ctx context.Context, id, authorId ksuid.KSUID) error
 	Update(ctx context.Context, post domain.Post) error
 }
 
@@ -43,24 +45,31 @@ func NewPostService(repos postgres.Post) *PostService {
 
 // Creating a new post.
 func (s *PostService) Create(ctx context.Context, post domain.Post) (ksuid.KSUID, error) {
+	var err error
+
 	// Validate a post.
 	if err := post.Validate(); err != nil {
 		return ksuid.Nil, err
 	}
 
-	// Create a new post.
-	id, err := s.repos.Create(ctx, post)
+	// Generating a new user id.
+	post.Id, err = ksuid.NewRandom()
 	if err != nil {
 		return ksuid.Nil, err
 	}
 
-	return id, nil
+	// Create a new post.
+	if err := s.repos.Create(ctx, post); err != nil {
+		return ksuid.Nil, err
+	}
+
+	return post.Id, nil
 }
 
 // Getting a post by id.
 func (s *PostService) GetByID(ctx context.Context, id ksuid.KSUID) (domain.Post, error) {
 	// Get post by id.
-	post, err := s.repos.GetByID(ctx, id)
+	post, err := s.repos.GetById(ctx, id)
 	if err != nil {
 		return domain.Post{}, err
 	}
@@ -68,9 +77,28 @@ func (s *PostService) GetByID(ctx context.Context, id ksuid.KSUID) (domain.Post,
 	return post, nil
 }
 
+// Getting author posts.
+func (s *PostService) GetAuthorPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error) {
+	// Check is first and last are set.
+	if first == nil && last == nil {
+		return nil, &domain.Error{
+			Message: "Must be `first` or `last`",
+			Code:    domain.CodeInvalidArgument,
+		}
+	}
+
+	// Getting author posts.
+	posts, err := s.repos.GetPosts(ctx, authorId, first, last)
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, err
+}
+
 // Deleting a post.
-func (s *PostService) Delete(ctx context.Context, id, authorID ksuid.KSUID) error {
-	return s.repos.Delete(ctx, id, authorID)
+func (s *PostService) Delete(ctx context.Context, id, authorId ksuid.KSUID) error {
+	return s.repos.Delete(ctx, id, authorId)
 }
 
 // Updating a post.

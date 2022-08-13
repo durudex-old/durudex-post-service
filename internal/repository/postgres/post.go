@@ -36,7 +36,7 @@ const PostTable string = "post"
 type Post interface {
 	Create(ctx context.Context, post domain.Post) error
 	GetById(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
-	GetAuthorPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error)
+	GetPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error)
 	Delete(ctx context.Context, id, authorId ksuid.KSUID) error
 	Update(ctx context.Context, post domain.Post) error
 }
@@ -84,7 +84,7 @@ func (r *PostRepository) GetById(ctx context.Context, id ksuid.KSUID) (domain.Po
 }
 
 // Getting author posts by author id in postgres database.
-func (r *PostRepository) GetAuthorPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error) {
+func (r *PostRepository) GetPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error) {
 	var (
 		// Posts numbers.
 		n int32
@@ -133,7 +133,15 @@ func (r *PostRepository) GetAuthorPosts(ctx context.Context, authorId ksuid.KSUI
 		return nil, err
 	}
 
-	return posts, nil
+	// Check for fullness of the slice.
+	if i == int(n) {
+		return posts, nil
+	}
+
+	res := make([]domain.Post, i)
+	copy(res, posts[:i])
+
+	return res, nil
 }
 
 // Deleting a post in postgres database.

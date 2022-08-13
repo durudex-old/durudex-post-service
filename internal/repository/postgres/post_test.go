@@ -145,7 +145,7 @@ func TestPostRepository_GetByID(t *testing.T) {
 }
 
 // Testing getting author posts by author id in postgres database.
-func TestPostRepository_GetAuthorPosts(t *testing.T) {
+func TestPostRepository_GetPosts(t *testing.T) {
 	// Creating a new mock connection.
 	mock, err := pgxmock.NewConn()
 	if err != nil {
@@ -210,7 +210,7 @@ func TestPostRepository_GetAuthorPosts(t *testing.T) {
 			tt.mockBehavior(tt.args, tt.want)
 
 			// Getting a post by id in postgres database.
-			got, err := repos.GetAuthorPosts(context.Background(), tt.args.authorId, tt.args.first, tt.args.last)
+			got, err := repos.GetPosts(context.Background(), tt.args.authorId, tt.args.first, tt.args.last)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("error getting author posts: %s", err.Error())
 			}

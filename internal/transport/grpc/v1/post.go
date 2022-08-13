@@ -46,7 +46,7 @@ func (h *PostHandler) CreatePost(ctx context.Context, input *v1.CreatePostReques
 	// Getting post author ksuid from bytes.
 	authorId, err := ksuid.FromBytes(input.AuthorId)
 	if err != nil {
-		return &v1.CreatePostResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		return &v1.CreatePostResponse{}, status.Error(codes.InvalidArgument, "Invalid author id")
 	}
 
 	// Create a new post.
@@ -66,7 +66,7 @@ func (h *PostHandler) GetPostById(ctx context.Context, input *v1.GetPostByIdRequ
 	// Getting post ksuid from bytes.
 	id, err := ksuid.FromBytes(input.Id)
 	if err != nil {
-		return &v1.GetPostByIdResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		return &v1.GetPostByIdResponse{}, status.Error(codes.InvalidArgument, "Invalid post id")
 	}
 
 	// Getting post by id.
@@ -82,18 +82,46 @@ func (h *PostHandler) GetPostById(ctx context.Context, input *v1.GetPostByIdRequ
 	}, nil
 }
 
+// Getting author posts handler.
+func (h *Handler) GetAuthorPosts(ctx context.Context, input *v1.GetAuthorPostsRequest) (*v1.GetAuthorPostsResponse, error) {
+	// Getting author ksuid from bytes.
+	authorId, err := ksuid.FromBytes(input.AuthorId)
+	if err != nil {
+		return &v1.GetAuthorPostsResponse{}, status.Error(codes.InvalidArgument, "Invalid author id")
+	}
+
+	// Getting author posts.
+	posts, err := h.service.GetAuthorPosts(ctx, authorId, input.First, input.Last)
+	if err != nil {
+		return &v1.GetAuthorPostsResponse{}, err
+	}
+
+	responsePosts := make([]*v1.Post, len(posts))
+
+	for i, post := range posts {
+		responsePosts[i] = &v1.Post{
+			Id:        post.Id.Bytes(),
+			AuthorId:  post.AuthorId.Bytes(),
+			Text:      post.Text,
+			UpdatedAt: timestamp.NewOptional(post.UpdatedAt),
+		}
+	}
+
+	return &v1.GetAuthorPostsResponse{Posts: responsePosts}, nil
+}
+
 // Deleting a post handler.
 func (h *PostHandler) DeletePost(ctx context.Context, input *v1.DeletePostRequest) (*v1.DeletePostResponse, error) {
 	// Getting post ksuid from bytes.
 	id, err := ksuid.FromBytes(input.Id)
 	if err != nil {
-		return &v1.DeletePostResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		return &v1.DeletePostResponse{}, status.Error(codes.InvalidArgument, "Invalid post id")
 	}
 
 	// Getting post author ksuid from bytes.
 	authorId, err := ksuid.FromBytes(input.AuthorId)
 	if err != nil {
-		return &v1.DeletePostResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		return &v1.DeletePostResponse{}, status.Error(codes.InvalidArgument, "Invalid author id")
 	}
 
 	// Deleting post.
@@ -109,13 +137,13 @@ func (h *PostHandler) UpdatePost(ctx context.Context, input *v1.UpdatePostReques
 	// Getting post ksuid from bytes.
 	id, err := ksuid.FromBytes(input.Id)
 	if err != nil {
-		return &v1.UpdatePostResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		return &v1.UpdatePostResponse{}, status.Error(codes.InvalidArgument, "Invalid post id")
 	}
 
 	// Getting post author ksuid from bytes.
 	authorId, err := ksuid.FromBytes(input.AuthorId)
 	if err != nil {
-		return &v1.UpdatePostResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		return &v1.UpdatePostResponse{}, status.Error(codes.InvalidArgument, "Invalid author id")
 	}
 
 	// Updating post.
