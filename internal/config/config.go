@@ -30,8 +30,8 @@ const defaultConfigPath string = "configs/main"
 type (
 	// Config variables.
 	Config struct {
-		GRPC     GRPCConfig
-		Database DatabaseConfig
+		GRPC     GRPCConfig     `mapstructure:"grpc"`
+		Database DatabaseConfig `mapstructure:"database"`
 	}
 
 	// gRPC server config variables.
@@ -74,7 +74,7 @@ func Init() (*Config, error) {
 	var cfg Config
 
 	// Unmarshal config keys.
-	if err := unmarshal(&cfg); err != nil {
+	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, err
 	}
 
@@ -104,18 +104,6 @@ func parseConfigFile() error {
 
 	// Read config file.
 	return viper.ReadInConfig()
-}
-
-// Unmarshal config keys.
-func unmarshal(cfg *Config) error {
-	log.Debug().Msg("Unmarshal config keys...")
-
-	// Unmarshal database keys.
-	if err := viper.UnmarshalKey("database", &cfg.Database); err != nil {
-		return err
-	}
-	// Unmarshal gRPC server keys.
-	return viper.UnmarshalKey("grpc", &cfg.GRPC)
 }
 
 // Setting environment variables from .env file.
