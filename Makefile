@@ -51,4 +51,8 @@ buf: buf-lint
 buf-lint:
 	buf lint proto/src/api/durudex/v1/post.proto
 
+.PHONY: mock
+mock:
+	mockgen -source=internal/repository/postgres/post.go -destination=internal/repository/postgres/mock/post.go
+
 .DEFAULT_GOAL := run

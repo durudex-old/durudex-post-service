@@ -29,8 +29,8 @@ import (
 // Post interface.
 type Post interface {
 	Create(ctx context.Context, post domain.Post) (ksuid.KSUID, error)
-	GetByID(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
-	GetAuthorPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error)
+	GetById(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
+	GetPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error)
 	Delete(ctx context.Context, id, authorId ksuid.KSUID) error
 	Update(ctx context.Context, post domain.Post) error
 }
@@ -53,9 +53,11 @@ func (s *PostService) Create(ctx context.Context, post domain.Post) (ksuid.KSUID
 	}
 
 	// Generating a new user id.
-	post.Id, err = ksuid.NewRandom()
-	if err != nil {
-		return ksuid.Nil, err
+	if post.Id.IsNil() {
+		post.Id, err = ksuid.NewRandom()
+		if err != nil {
+			return ksuid.Nil, err
+		}
 	}
 
 	// Create a new post.
@@ -67,7 +69,7 @@ func (s *PostService) Create(ctx context.Context, post domain.Post) (ksuid.KSUID
 }
 
 // Getting a post by id.
-func (s *PostService) GetByID(ctx context.Context, id ksuid.KSUID) (domain.Post, error) {
+func (s *PostService) GetById(ctx context.Context, id ksuid.KSUID) (domain.Post, error) {
 	// Get post by id.
 	post, err := s.repos.GetById(ctx, id)
 	if err != nil {
@@ -78,7 +80,7 @@ func (s *PostService) GetByID(ctx context.Context, id ksuid.KSUID) (domain.Post,
 }
 
 // Getting author posts.
-func (s *PostService) GetAuthorPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error) {
+func (s *PostService) GetPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error) {
 	// Check is first and last are set.
 	if first == nil && last == nil {
 		return nil, &domain.Error{

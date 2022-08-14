@@ -70,7 +70,7 @@ func (h *PostHandler) GetPostById(ctx context.Context, input *v1.GetPostByIdRequ
 	}
 
 	// Getting post by id.
-	post, err := h.service.GetByID(ctx, id)
+	post, err := h.service.GetById(ctx, id)
 	if err != nil {
 		return &v1.GetPostByIdResponse{}, err
 	}
@@ -91,7 +91,7 @@ func (h *Handler) GetAuthorPosts(ctx context.Context, input *v1.GetAuthorPostsRe
 	}
 
 	// Getting author posts.
-	posts, err := h.service.GetAuthorPosts(ctx, authorId, input.First, input.Last)
+	posts, err := h.service.GetPosts(ctx, authorId, input.First, input.Last)
 	if err != nil {
 		return &v1.GetAuthorPostsResponse{}, err
 	}
@@ -101,7 +101,7 @@ func (h *Handler) GetAuthorPosts(ctx context.Context, input *v1.GetAuthorPostsRe
 	for i, post := range posts {
 		responsePosts[i] = &v1.Post{
 			Id:        post.Id.Bytes(),
-			AuthorId:  post.AuthorId.Bytes(),
+			AuthorId:  authorId.Bytes(),
 			Text:      post.Text,
 			UpdatedAt: timestamp.NewOptional(post.UpdatedAt),
 		}

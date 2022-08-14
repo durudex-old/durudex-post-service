@@ -104,7 +104,7 @@ func (r *PostRepository) GetPosts(ctx context.Context, authorId ksuid.KSUID, fir
 	posts := make([]domain.Post, n)
 
 	// Query for get author posts.
-	query := fmt.Sprintf(`SELECT "id", "author_id", "text", "updated_at" FROM "%s"
+	query := fmt.Sprintf(`SELECT "id", "text", "updated_at" FROM "%s"
 		WHERE "author_id"=$1 ORDER BY "id" %s LIMIT $2`, PostTable, filter)
 
 	rows, err := r.psql.Query(ctx, query, authorId, n)
@@ -119,7 +119,7 @@ func (r *PostRepository) GetPosts(ctx context.Context, authorId ksuid.KSUID, fir
 		var post domain.Post
 
 		// Scanning query row.
-		if err := rows.Scan(&post.Id, &post.AuthorId, &post.Text, &post.UpdatedAt); err != nil {
+		if err := rows.Scan(&post.Id, &post.Text, &post.UpdatedAt); err != nil {
 			return nil, err
 		}
 

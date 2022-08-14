@@ -187,14 +187,13 @@ func TestPostRepository_GetPosts(t *testing.T) {
 			want: []domain.Post{
 				{
 					Id:        ksuid.New(),
-					AuthorId:  ksuid.New(),
 					Text:      "text",
 					UpdatedAt: nil,
 				},
 			},
 			mockBehavior: func(args args, want []domain.Post) {
-				rows := mock.NewRows([]string{"id", "author_id", "text", "updated_at"}).AddRow(
-					want[0].Id, want[0].AuthorId, want[0].Text, want[0].UpdatedAt,
+				rows := mock.NewRows([]string{"id", "text", "updated_at"}).AddRow(
+					want[0].Id, want[0].Text, want[0].UpdatedAt,
 				)
 
 				mock.ExpectQuery(fmt.Sprintf(`SELECT (.+) FROM "%s"`, postgres.PostTable)).
@@ -216,7 +215,7 @@ func TestPostRepository_GetPosts(t *testing.T) {
 			}
 
 			// Check for similarity of posts.
-			if !reflect.DeepEqual(got[0], tt.want[0]) {
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Error("error posts are not similar")
 			}
 		})
