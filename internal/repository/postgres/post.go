@@ -35,10 +35,15 @@ const PostTable string = "post"
 
 // Post repository interface.
 type Post interface {
+	// Creating a new post in postgres database.
 	Create(ctx context.Context, post domain.Post) error
+	// Getting a post by id in postgres database.
 	GetById(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
+	// Getting author posts by author id in postgres database.
 	GetPosts(ctx context.Context, authorId ksuid.KSUID, sort domain.SortOptions) ([]domain.Post, error)
+	// Deleting a post in postgres database.
 	Delete(ctx context.Context, id, authorId ksuid.KSUID) error
+	// Updating a post in postgres database.
 	Update(ctx context.Context, post domain.Post) error
 }
 

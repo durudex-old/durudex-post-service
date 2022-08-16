@@ -28,10 +28,15 @@ import (
 
 // Post interface.
 type Post interface {
+	// Creating a new post.
 	Create(ctx context.Context, post domain.Post) (ksuid.KSUID, error)
+	// Getting a post by id.
 	GetById(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
+	// Getting author posts.
 	GetPosts(ctx context.Context, authorId ksuid.KSUID, sort domain.SortOptions) ([]domain.Post, error)
+	// Deleting a post.
 	Delete(ctx context.Context, id, authorId ksuid.KSUID) error
+	// Updating a post.
 	Update(ctx context.Context, post domain.Post) error
 }
 
