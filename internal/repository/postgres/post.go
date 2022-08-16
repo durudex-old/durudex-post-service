@@ -26,6 +26,7 @@ import (
 	"github.com/durudex/durudex-post-service/pkg/database/postgres"
 
 	"github.com/jackc/pgx/v4"
+	"github.com/leporo/sqlf"
 	"github.com/segmentio/ksuid"
 )
 
@@ -36,7 +37,7 @@ const PostTable string = "post"
 type Post interface {
 	Create(ctx context.Context, post domain.Post) error
 	GetById(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
-	GetPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error)
+	GetPosts(ctx context.Context, authorId ksuid.KSUID, sort domain.SortOptions) ([]domain.Post, error)
 	Delete(ctx context.Context, id, authorId ksuid.KSUID) error
 	Update(ctx context.Context, post domain.Post) error
 }
@@ -84,33 +85,37 @@ func (r *PostRepository) GetById(ctx context.Context, id ksuid.KSUID) (domain.Po
 }
 
 // Getting author posts by author id in postgres database.
-func (r *PostRepository) GetPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error) {
-	var (
-		// Posts numbers.
-		n int32
-		// Query post filter.
-		filter string
-	)
+func (r *PostRepository) GetPosts(ctx context.Context, authorId ksuid.KSUID, sort domain.SortOptions) ([]domain.Post, error) {
+	var n int32
 
-	// Set query filter.
-	if first == nil {
-		n = *last
-		filter = "DESC"
-	} else {
-		n = *first
-		filter = "ASC"
+	qb := sqlf.Select("id, created_at, text, updated_at").From(PostTable).Where("author_id = ?", authorId)
+
+	// Added first or last sort option.
+	if sort.First != nil {
+		n = *sort.First
+		qb.OrderBy("created_at ASC, id ASC").Limit(*sort.First)
+	} else if sort.Last != nil {
+		n = *sort.Last
+		qb.OrderBy("created_at DESC, id DESC").Limit(*sort.Last)
+	}
+
+	// Added before sort option.
+	if sort.Before != ksuid.Nil {
+		qb.Where("(created_at, id) < (?, ?)", sort.Before.Time(), sort.Before)
+	}
+	// Added after sort option.
+	if sort.After != ksuid.Nil {
+		qb.Where("(created_at, id) > (?, ?)", sort.After.Time(), sort.After)
 	}
 
 	posts := make([]domain.Post, n)
 
-	// Query for get author posts.
-	query := fmt.Sprintf(`SELECT "id", "text", "updated_at" FROM "%s"
-		WHERE "author_id"=$1 ORDER BY "id" %s LIMIT $2`, PostTable, filter)
-
-	rows, err := r.psql.Query(ctx, query, authorId, n)
+	// Query for getting author posts by author id.
+	rows, err := r.psql.Query(ctx, qb.String(), qb.Args()...)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	var i int
 
@@ -119,7 +124,7 @@ func (r *PostRepository) GetPosts(ctx context.Context, authorId ksuid.KSUID, fir
 		var post domain.Post
 
 		// Scanning query row.
-		if err := rows.Scan(&post.Id, &post.Text, &post.UpdatedAt); err != nil {
+		if err := rows.Scan(&post.Id, &post.CreatedAt, &post.Text, &post.UpdatedAt); err != nil {
 			return nil, err
 		}
 

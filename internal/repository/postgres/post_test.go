@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/durudex/durudex-post-service/internal/domain"
 	"github.com/durudex/durudex-post-service/internal/repository/postgres"
@@ -156,8 +157,7 @@ func TestPostRepository_GetPosts(t *testing.T) {
 	// Testing args.
 	type args struct {
 		authorId ksuid.KSUID
-		first    *int32
-		last     *int32
+		sort     domain.SortOptions
 	}
 
 	// Test behavior.
@@ -181,23 +181,26 @@ func TestPostRepository_GetPosts(t *testing.T) {
 			name: "OK",
 			args: args{
 				authorId: ksuid.New(),
-				first:    &filer,
-				last:     nil,
+				sort: domain.SortOptions{
+					First:  &filer,
+					Before: ksuid.New(),
+				},
 			},
 			want: []domain.Post{
 				{
 					Id:        ksuid.New(),
+					CreatedAt: time.Now(),
 					Text:      "text",
 					UpdatedAt: nil,
 				},
 			},
 			mockBehavior: func(args args, want []domain.Post) {
-				rows := mock.NewRows([]string{"id", "text", "updated_at"}).AddRow(
-					want[0].Id, want[0].Text, want[0].UpdatedAt,
+				rows := mock.NewRows([]string{"id", "created_at", "text", "updated_at"}).AddRow(
+					want[0].Id, want[0].CreatedAt, want[0].Text, want[0].UpdatedAt,
 				)
 
-				mock.ExpectQuery(fmt.Sprintf(`SELECT (.+) FROM "%s"`, postgres.PostTable)).
-					WithArgs(args.authorId, *args.first).
+				mock.ExpectQuery(fmt.Sprintf(`SELECT (.+) FROM %s`, postgres.PostTable)).
+					WithArgs(args.authorId, args.sort.Before.Time(), args.sort.Before, *args.sort.First).
 					WillReturnRows(rows)
 			},
 		},
@@ -209,7 +212,7 @@ func TestPostRepository_GetPosts(t *testing.T) {
 			tt.mockBehavior(tt.args, tt.want)
 
 			// Getting a post by id in postgres database.
-			got, err := repos.GetPosts(context.Background(), tt.args.authorId, tt.args.first, tt.args.last)
+			got, err := repos.GetPosts(context.Background(), tt.args.authorId, tt.args.sort)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("error getting author posts: %s", err.Error())
 			}

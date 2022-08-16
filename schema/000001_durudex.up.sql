@@ -18,6 +18,7 @@
 CREATE TABLE IF NOT EXISTS "post" (
   "id"         CHAR(27)  NOT NULL PRIMARY KEY,
   "author_id"  CHAR(27)  NOT NULL,
+  "created_at" TIMESTAMP NOT NULL DEFAULT now(),
   "text"       TEXT      NOT NULL,
   "updated_at" TIMESTAMP
 );

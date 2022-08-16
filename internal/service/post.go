@@ -30,7 +30,7 @@ import (
 type Post interface {
 	Create(ctx context.Context, post domain.Post) (ksuid.KSUID, error)
 	GetById(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
-	GetPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error)
+	GetPosts(ctx context.Context, authorId ksuid.KSUID, sort domain.SortOptions) ([]domain.Post, error)
 	Delete(ctx context.Context, id, authorId ksuid.KSUID) error
 	Update(ctx context.Context, post domain.Post) error
 }
@@ -80,9 +80,9 @@ func (s *PostService) GetById(ctx context.Context, id ksuid.KSUID) (domain.Post,
 }
 
 // Getting author posts.
-func (s *PostService) GetPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error) {
+func (s *PostService) GetPosts(ctx context.Context, authorId ksuid.KSUID, sort domain.SortOptions) ([]domain.Post, error) {
 	// Check is first and last are set.
-	if first == nil && last == nil {
+	if sort.First == nil && sort.Last == nil {
 		return nil, &domain.Error{
 			Message: "Must be `first` or `last`",
 			Code:    domain.CodeInvalidArgument,
@@ -90,7 +90,10 @@ func (s *PostService) GetPosts(ctx context.Context, authorId ksuid.KSUID, first,
 	}
 
 	// Getting author posts.
-	posts, err := s.repos.GetPosts(ctx, authorId, first, last)
+	posts, err := s.repos.GetPosts(ctx, authorId, domain.SortOptions{
+		First: sort.First,
+		Last:  sort.Last,
+	})
 	if err != nil {
 		return nil, err
 	}

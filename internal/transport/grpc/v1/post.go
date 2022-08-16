@@ -91,7 +91,10 @@ func (h *Handler) GetAuthorPosts(ctx context.Context, input *v1.GetAuthorPostsRe
 	}
 
 	// Getting author posts.
-	posts, err := h.service.GetPosts(ctx, authorId, input.First, input.Last)
+	posts, err := h.service.GetPosts(ctx, authorId, domain.SortOptions{
+		First: input.First,
+		Last:  input.Last,
+	})
 	if err != nil {
 		return &v1.GetAuthorPostsResponse{}, err
 	}

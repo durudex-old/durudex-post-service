@@ -17,27 +17,12 @@
 
 package domain
 
-import (
-	"time"
+import "github.com/segmentio/ksuid"
 
-	"github.com/segmentio/ksuid"
-)
-
-// Post structure.
-type Post struct {
-	Id        ksuid.KSUID
-	AuthorId  ksuid.KSUID
-	CreatedAt time.Time
-	Text      string
-	UpdatedAt *time.Time
-}
-
-// Validate post.
-func (p Post) Validate() error {
-	// Check post text length.
-	if len(p.Text) > 500 {
-		return &Error{Code: CodeInvalidArgument, Message: "Text is too long"}
-	}
-
-	return nil
+// Query sorting options.
+type SortOptions struct {
+	First  *int32
+	Last   *int32
+	Before ksuid.KSUID
+	After  ksuid.KSUID
 }

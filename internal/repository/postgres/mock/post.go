@@ -80,18 +80,18 @@ func (mr *MockPostMockRecorder) GetById(ctx, id interface{}) *gomock.Call {
 }
 
 // GetPosts mocks base method.
-func (m *MockPost) GetPosts(ctx context.Context, authorId ksuid.KSUID, first, last *int32) ([]domain.Post, error) {
+func (m *MockPost) GetPosts(ctx context.Context, authorId ksuid.KSUID, sort domain.SortOptions) ([]domain.Post, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPosts", ctx, authorId, first, last)
+	ret := m.ctrl.Call(m, "GetPosts", ctx, authorId, sort)
 	ret0, _ := ret[0].([]domain.Post)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetPosts indicates an expected call of GetPosts.
-func (mr *MockPostMockRecorder) GetPosts(ctx, authorId, first, last interface{}) *gomock.Call {
+func (mr *MockPostMockRecorder) GetPosts(ctx, authorId, sort interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPosts", reflect.TypeOf((*MockPost)(nil).GetPosts), ctx, authorId, first, last)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPosts", reflect.TypeOf((*MockPost)(nil).GetPosts), ctx, authorId, sort)
 }
 
 // Update mocks base method.

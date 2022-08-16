@@ -160,8 +160,7 @@ func TestPostService_GetPosts(t *testing.T) {
 	// Testing args.
 	type args struct {
 		authorId ksuid.KSUID
-		first    *int32
-		last     *int32
+		sort     domain.SortOptions
 	}
 
 	// Test behavior.
@@ -182,8 +181,9 @@ func TestPostService_GetPosts(t *testing.T) {
 			name: "OK",
 			args: args{
 				authorId: ksuid.New(),
-				first:    &filer,
-				last:     nil,
+				sort: domain.SortOptions{
+					First: &filer,
+				},
 			},
 			want: []domain.Post{
 				{
@@ -192,7 +192,7 @@ func TestPostService_GetPosts(t *testing.T) {
 				},
 			},
 			mockBehavior: func(r *mock_postgres.MockPost, args args, want []domain.Post) {
-				r.EXPECT().GetPosts(context.Background(), args.authorId, args.first, args.last).Return(want, nil)
+				r.EXPECT().GetPosts(context.Background(), args.authorId, args.sort).Return(want, nil)
 			},
 		},
 	}
@@ -207,7 +207,7 @@ func TestPostService_GetPosts(t *testing.T) {
 			service := service.NewPostService(psql)
 
 			// Getting a post by id.
-			got, err := service.GetPosts(context.Background(), tt.args.authorId, tt.args.first, tt.args.last)
+			got, err := service.GetPosts(context.Background(), tt.args.authorId, tt.args.sort)
 			if err != nil {
 				t.Errorf("error getting posts: %s", err.Error())
 			}
