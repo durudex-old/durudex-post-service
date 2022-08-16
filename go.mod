@@ -9,7 +9,7 @@ require (
 	github.com/jackc/pgx/v4 v4.15.0
 	github.com/pashagolub/pgxmock v1.4.0
 	github.com/rs/zerolog v1.26.1
-	github.com/segmentio/ksuid v1.0.4
+	github.com/segmentio/ksuid v1.0.5-0.20220816194758-874a68afca39
 	github.com/spf13/viper v1.10.1
 	google.golang.org/grpc v1.45.0
 	google.golang.org/protobuf v1.28.0

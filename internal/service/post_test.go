@@ -89,8 +89,8 @@ func TestPostService_Create(t *testing.T) {
 	}
 }
 
-// Testing getting a post by id.
-func TestPostService_GetById(t *testing.T) {
+// Testing getting a post.
+func TestPostService_GetBy(t *testing.T) {
 	// Creating a new mock controller.
 	c := gomock.NewController(t)
 	defer c.Finish()
@@ -135,7 +135,7 @@ func TestPostService_GetById(t *testing.T) {
 			service := service.NewPostService(psql)
 
 			// Getting a post by id.
-			got, err := service.GetById(context.Background(), tt.args.id)
+			got, err := service.GetBy(context.Background(), tt.args.id)
 			if err != nil {
 				t.Errorf("error getting post by id: %s", err.Error())
 			}

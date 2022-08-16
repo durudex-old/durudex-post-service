@@ -30,8 +30,8 @@ import (
 type Post interface {
 	// Creating a new post.
 	Create(ctx context.Context, post domain.Post) (ksuid.KSUID, error)
-	// Getting a post by id.
-	GetById(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
+	// Getting a post.
+	GetBy(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
 	// Getting author posts.
 	GetPosts(ctx context.Context, authorId ksuid.KSUID, sort domain.SortOptions) ([]domain.Post, error)
 	// Deleting a post.
@@ -73,8 +73,8 @@ func (s *PostService) Create(ctx context.Context, post domain.Post) (ksuid.KSUID
 	return post.Id, nil
 }
 
-// Getting a post by id.
-func (s *PostService) GetById(ctx context.Context, id ksuid.KSUID) (domain.Post, error) {
+// Getting a post.
+func (s *PostService) GetBy(ctx context.Context, id ksuid.KSUID) (domain.Post, error) {
 	// Get post by id.
 	post, err := s.repos.GetById(ctx, id)
 	if err != nil {

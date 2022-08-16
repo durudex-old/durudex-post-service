@@ -26,8 +26,6 @@ import (
 	v1 "github.com/durudex/durudex-post-service/pkg/pb/durudex/v1"
 
 	"github.com/segmentio/ksuid"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // Sample gRPC server handler.
@@ -43,15 +41,9 @@ func NewPostHandler(service service.Post) *PostHandler {
 
 // Creating a new post handler.
 func (h *PostHandler) CreatePost(ctx context.Context, input *v1.CreatePostRequest) (*v1.CreatePostResponse, error) {
-	// Getting post author ksuid from bytes.
-	authorId, err := ksuid.FromBytes(input.AuthorId)
-	if err != nil {
-		return &v1.CreatePostResponse{}, status.Error(codes.InvalidArgument, "Invalid author id")
-	}
-
 	// Create a new post.
 	id, err := h.service.Create(ctx, domain.Post{
-		AuthorId: authorId,
+		AuthorId: ksuid.FromBytesOrNil(input.AuthorId),
 		Text:     input.Text,
 	})
 	if err != nil {
@@ -61,42 +53,33 @@ func (h *PostHandler) CreatePost(ctx context.Context, input *v1.CreatePostReques
 	return &v1.CreatePostResponse{Id: id.Bytes()}, nil
 }
 
-// Getting a post by id handler.
-func (h *PostHandler) GetPostById(ctx context.Context, input *v1.GetPostByIdRequest) (*v1.GetPostByIdResponse, error) {
-	// Getting post ksuid from bytes.
-	id, err := ksuid.FromBytes(input.Id)
-	if err != nil {
-		return &v1.GetPostByIdResponse{}, status.Error(codes.InvalidArgument, "Invalid post id")
-	}
-
+// Getting a post handler.
+func (h *PostHandler) GetPost(ctx context.Context, input *v1.GetPostRequest) (*v1.GetPostResponse, error) {
 	// Getting post by id.
-	post, err := h.service.GetById(ctx, id)
+	post, err := h.service.GetBy(ctx, ksuid.FromBytesOrNil(input.Id))
 	if err != nil {
-		return &v1.GetPostByIdResponse{}, err
+		return &v1.GetPostResponse{}, err
 	}
 
-	return &v1.GetPostByIdResponse{
+	return &v1.GetPostResponse{
 		AuthorId:  post.AuthorId.Bytes(),
 		Text:      post.Text,
 		UpdatedAt: timestamp.NewOptional(post.UpdatedAt),
 	}, nil
 }
 
-// Getting author posts handler.
-func (h *Handler) GetAuthorPosts(ctx context.Context, input *v1.GetAuthorPostsRequest) (*v1.GetAuthorPostsResponse, error) {
-	// Getting author ksuid from bytes.
-	authorId, err := ksuid.FromBytes(input.AuthorId)
+// Getting posts handler.
+func (h *Handler) GetPosts(ctx context.Context, input *v1.GetPostsRequest) (*v1.GetPostsResponse, error) {
+	// Getting posts.
+	posts, err := h.service.GetPosts(ctx, ksuid.FromBytesOrNil(input.AuthorId),
+		domain.SortOptions{
+			First:  input.SortOptions.First,
+			Last:   input.SortOptions.Last,
+			Before: ksuid.FromBytesOrNil(input.SortOptions.Before),
+			After:  ksuid.FromBytesOrNil(input.SortOptions.After),
+		})
 	if err != nil {
-		return &v1.GetAuthorPostsResponse{}, status.Error(codes.InvalidArgument, "Invalid author id")
-	}
-
-	// Getting author posts.
-	posts, err := h.service.GetPosts(ctx, authorId, domain.SortOptions{
-		First: input.First,
-		Last:  input.Last,
-	})
-	if err != nil {
-		return &v1.GetAuthorPostsResponse{}, err
+		return &v1.GetPostsResponse{}, err
 	}
 
 	responsePosts := make([]*v1.Post, len(posts))
@@ -104,31 +87,18 @@ func (h *Handler) GetAuthorPosts(ctx context.Context, input *v1.GetAuthorPostsRe
 	for i, post := range posts {
 		responsePosts[i] = &v1.Post{
 			Id:        post.Id.Bytes(),
-			AuthorId:  authorId.Bytes(),
 			Text:      post.Text,
 			UpdatedAt: timestamp.NewOptional(post.UpdatedAt),
 		}
 	}
 
-	return &v1.GetAuthorPostsResponse{Posts: responsePosts}, nil
+	return &v1.GetPostsResponse{Posts: responsePosts}, nil
 }
 
 // Deleting a post handler.
 func (h *PostHandler) DeletePost(ctx context.Context, input *v1.DeletePostRequest) (*v1.DeletePostResponse, error) {
-	// Getting post ksuid from bytes.
-	id, err := ksuid.FromBytes(input.Id)
-	if err != nil {
-		return &v1.DeletePostResponse{}, status.Error(codes.InvalidArgument, "Invalid post id")
-	}
-
-	// Getting post author ksuid from bytes.
-	authorId, err := ksuid.FromBytes(input.AuthorId)
-	if err != nil {
-		return &v1.DeletePostResponse{}, status.Error(codes.InvalidArgument, "Invalid author id")
-	}
-
 	// Deleting post.
-	if err := h.service.Delete(ctx, id, authorId); err != nil {
+	if err := h.service.Delete(ctx, ksuid.FromBytesOrNil(input.Id), ksuid.FromBytesOrNil(input.AuthorId)); err != nil {
 		return &v1.DeletePostResponse{}, err
 	}
 
@@ -137,22 +107,10 @@ func (h *PostHandler) DeletePost(ctx context.Context, input *v1.DeletePostReques
 
 // Updating a post handler.
 func (h *PostHandler) UpdatePost(ctx context.Context, input *v1.UpdatePostRequest) (*v1.UpdatePostResponse, error) {
-	// Getting post ksuid from bytes.
-	id, err := ksuid.FromBytes(input.Id)
-	if err != nil {
-		return &v1.UpdatePostResponse{}, status.Error(codes.InvalidArgument, "Invalid post id")
-	}
-
-	// Getting post author ksuid from bytes.
-	authorId, err := ksuid.FromBytes(input.AuthorId)
-	if err != nil {
-		return &v1.UpdatePostResponse{}, status.Error(codes.InvalidArgument, "Invalid author id")
-	}
-
 	// Updating post.
 	if err := h.service.Update(ctx, domain.Post{
-		Id:       id,
-		AuthorId: authorId,
+		Id:       ksuid.FromBytesOrNil(input.Id),
+		AuthorId: ksuid.FromBytesOrNil(input.AuthorId),
 		Text:     input.Text,
 	}); err != nil {
 		return &v1.UpdatePostResponse{}, err
