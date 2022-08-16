@@ -31,7 +31,7 @@ type Post interface {
 	// Creating a new post.
 	Create(ctx context.Context, post domain.Post) (ksuid.KSUID, error)
 	// Getting a post.
-	GetBy(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
+	Get(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
 	// Getting author posts.
 	GetPosts(ctx context.Context, authorId ksuid.KSUID, sort domain.SortOptions) ([]domain.Post, error)
 	// Deleting a post.
@@ -74,9 +74,9 @@ func (s *PostService) Create(ctx context.Context, post domain.Post) (ksuid.KSUID
 }
 
 // Getting a post.
-func (s *PostService) GetBy(ctx context.Context, id ksuid.KSUID) (domain.Post, error) {
+func (s *PostService) Get(ctx context.Context, id ksuid.KSUID) (domain.Post, error) {
 	// Get post by id.
-	post, err := s.repos.GetById(ctx, id)
+	post, err := s.repos.Get(ctx, id)
 	if err != nil {
 		return domain.Post{}, err
 	}

@@ -56,7 +56,7 @@ func (h *PostHandler) CreatePost(ctx context.Context, input *v1.CreatePostReques
 // Getting a post handler.
 func (h *PostHandler) GetPost(ctx context.Context, input *v1.GetPostRequest) (*v1.GetPostResponse, error) {
 	// Getting post by id.
-	post, err := h.service.GetBy(ctx, ksuid.FromBytesOrNil(input.Id))
+	post, err := h.service.Get(ctx, ksuid.FromBytesOrNil(input.Id))
 	if err != nil {
 		return &v1.GetPostResponse{}, err
 	}

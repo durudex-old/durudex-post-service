@@ -27,7 +27,6 @@ import (
 type Post struct {
 	Id        ksuid.KSUID
 	AuthorId  ksuid.KSUID
-	CreatedAt time.Time
 	Text      string
 	UpdatedAt *time.Time
 }

@@ -64,19 +64,19 @@ func (mr *MockPostMockRecorder) Delete(ctx, id, authorId interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockPost)(nil).Delete), ctx, id, authorId)
 }
 
-// GetById mocks base method.
-func (m *MockPost) GetById(ctx context.Context, id ksuid.KSUID) (domain.Post, error) {
+// Get mocks base method.
+func (m *MockPost) Get(ctx context.Context, id ksuid.KSUID) (domain.Post, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetById", ctx, id)
+	ret := m.ctrl.Call(m, "Get", ctx, id)
 	ret0, _ := ret[0].(domain.Post)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetById indicates an expected call of GetById.
-func (mr *MockPostMockRecorder) GetById(ctx, id interface{}) *gomock.Call {
+// Get indicates an expected call of Get.
+func (mr *MockPostMockRecorder) Get(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetById", reflect.TypeOf((*MockPost)(nil).GetById), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockPost)(nil).Get), ctx, id)
 }
 
 // GetPosts mocks base method.

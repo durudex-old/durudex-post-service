@@ -38,7 +38,7 @@ type Post interface {
 	// Creating a new post in postgres database.
 	Create(ctx context.Context, post domain.Post) error
 	// Getting a post by id in postgres database.
-	GetById(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
+	Get(ctx context.Context, id ksuid.KSUID) (domain.Post, error)
 	// Getting author posts by author id in postgres database.
 	GetPosts(ctx context.Context, authorId ksuid.KSUID, sort domain.SortOptions) ([]domain.Post, error)
 	// Deleting a post in postgres database.
@@ -69,7 +69,7 @@ func (r *PostRepository) Create(ctx context.Context, post domain.Post) error {
 }
 
 // Getting a post by id in postgres database.
-func (r *PostRepository) GetById(ctx context.Context, id ksuid.KSUID) (domain.Post, error) {
+func (r *PostRepository) Get(ctx context.Context, id ksuid.KSUID) (domain.Post, error) {
 	var post domain.Post
 
 	// Query for get post by id.
@@ -93,7 +93,7 @@ func (r *PostRepository) GetById(ctx context.Context, id ksuid.KSUID) (domain.Po
 func (r *PostRepository) GetPosts(ctx context.Context, authorId ksuid.KSUID, sort domain.SortOptions) ([]domain.Post, error) {
 	var n int32
 
-	qb := sqlf.Select("id, created_at, text, updated_at").From(PostTable).Where("author_id = ?", authorId)
+	qb := sqlf.Select("id, text, updated_at").From(PostTable).Where("author_id = ?", authorId)
 
 	// Added first or last sort option.
 	if sort.First != nil {
@@ -129,7 +129,7 @@ func (r *PostRepository) GetPosts(ctx context.Context, authorId ksuid.KSUID, sor
 		var post domain.Post
 
 		// Scanning query row.
-		if err := rows.Scan(&post.Id, &post.CreatedAt, &post.Text, &post.UpdatedAt); err != nil {
+		if err := rows.Scan(&post.Id, &post.Text, &post.UpdatedAt); err != nil {
 			return nil, err
 		}
 

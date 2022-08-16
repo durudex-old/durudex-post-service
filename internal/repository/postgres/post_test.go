@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/durudex/durudex-post-service/internal/domain"
 	"github.com/durudex/durudex-post-service/internal/repository/postgres"
@@ -82,7 +81,7 @@ func TestPostRepository_Create(t *testing.T) {
 }
 
 // Testing getting a post by id in postgres database.
-func TestPostRepository_GetByID(t *testing.T) {
+func TestPostRepository_Get(t *testing.T) {
 	// Creating a new mock connection.
 	mock, err := pgxmock.NewConn()
 	if err != nil {
@@ -132,7 +131,7 @@ func TestPostRepository_GetByID(t *testing.T) {
 			tt.mockBehavior(tt.args, tt.want)
 
 			// Getting a post by id in postgres database.
-			got, err := repos.GetById(context.Background(), tt.args.id)
+			got, err := repos.Get(context.Background(), tt.args.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("error getting post by id: %s", err.Error())
 			}
@@ -189,14 +188,13 @@ func TestPostRepository_GetPosts(t *testing.T) {
 			want: []domain.Post{
 				{
 					Id:        ksuid.New(),
-					CreatedAt: time.Now(),
 					Text:      "text",
 					UpdatedAt: nil,
 				},
 			},
 			mockBehavior: func(args args, want []domain.Post) {
-				rows := mock.NewRows([]string{"id", "created_at", "text", "updated_at"}).AddRow(
-					want[0].Id, want[0].CreatedAt, want[0].Text, want[0].UpdatedAt,
+				rows := mock.NewRows([]string{"id", "text", "updated_at"}).AddRow(
+					want[0].Id, want[0].Text, want[0].UpdatedAt,
 				)
 
 				mock.ExpectQuery(fmt.Sprintf(`SELECT (.+) FROM %s`, postgres.PostTable)).
