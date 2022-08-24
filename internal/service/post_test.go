@@ -328,3 +328,61 @@ func TestPostService_Update(t *testing.T) {
 		})
 	}
 }
+
+// Testing getting total author posts count.
+func TestPostService_GetTotalCount(t *testing.T) {
+	// Creating a new mock controller.
+	c := gomock.NewController(t)
+	defer c.Finish()
+
+	// Creating a new mock repository.
+	psql := mock_postgres.NewMockPost(c)
+
+	// Testing args.
+	type args struct{ authorId ksuid.KSUID }
+
+	// Test behavior.
+	type mockBehavior func(r *mock_postgres.MockPost, args args, want int32)
+
+	// Tests structures.
+	tests := []struct {
+		name         string
+		args         args
+		want         int32
+		wantErr      bool
+		mockBehavior mockBehavior
+	}{
+		{
+			name: "OK",
+			args: args{authorId: ksuid.New()},
+			want: 10,
+			mockBehavior: func(r *mock_postgres.MockPost, args args, want int32) {
+				r.EXPECT().GetTotalCount(context.Background(), args.authorId).Return(want, nil)
+			},
+		},
+	}
+
+	// Conducting tests in various structures.
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setting a mock behavior.
+			tt.mockBehavior(psql, tt.args, tt.want)
+
+			// Creating a new post service.
+			service := service.NewPostService(psql)
+
+			// Getting total author posts count.
+			got, err := service.GetTotalCount(context.Background(), tt.args.authorId)
+			if err != nil {
+				if !tt.wantErr {
+					t.Errorf("error getting total author posts count: %s", err.Error())
+				}
+			}
+
+			// Check for similarity of post count.
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Error("error posts count are not similar")
+			}
+		})
+	}
+}

@@ -38,6 +38,8 @@ type Post interface {
 	Delete(ctx context.Context, id, authorId ksuid.KSUID) error
 	// Updating a post.
 	Update(ctx context.Context, post domain.Post) error
+	// Getting total author posts count.
+	GetTotalCount(ctx context.Context, authorId ksuid.KSUID) (int32, error)
 }
 
 // Post service structure.
@@ -119,4 +121,9 @@ func (s *PostService) Update(ctx context.Context, post domain.Post) error {
 	}
 
 	return s.repos.Update(ctx, post)
+}
+
+// Getting total author posts count.
+func (s *PostService) GetTotalCount(ctx context.Context, authorId ksuid.KSUID) (int32, error) {
+	return s.repos.GetTotalCount(ctx, authorId)
 }

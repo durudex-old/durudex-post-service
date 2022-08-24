@@ -19,7 +19,6 @@ package postgres_test
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -59,7 +58,7 @@ func TestPostRepository_Create(t *testing.T) {
 			name: "OK",
 			args: args{post: domain.Post{Id: ksuid.New(), AuthorId: ksuid.New(), Text: "text"}},
 			mockBehavior: func(args args) {
-				mock.ExpectExec(fmt.Sprintf(`INSERT INTO "%s"`, postgres.PostTable)).
+				mock.ExpectExec("INSERT INTO post").
 					WithArgs(args.post.Id, args.post.AuthorId, args.post.Text).
 					WillReturnResult(pgxmock.NewResult("", 1))
 			},
@@ -118,7 +117,7 @@ func TestPostRepository_Get(t *testing.T) {
 				rows := mock.NewRows([]string{"author_id", "text", "updated_at"}).AddRow(
 					post.AuthorId, post.Text, post.UpdatedAt)
 
-				mock.ExpectQuery(fmt.Sprintf(`SELECT (.+) FROM "%s"`, postgres.PostTable)).
+				mock.ExpectQuery("SELECT (.+) FROM post").
 					WithArgs(args.id).
 					WillReturnRows(rows)
 			},
@@ -197,7 +196,7 @@ func TestPostRepository_GetPosts(t *testing.T) {
 					want[0].Id, want[0].Text, want[0].UpdatedAt,
 				)
 
-				mock.ExpectQuery(fmt.Sprintf(`SELECT (.+) FROM %s`, postgres.PostTable)).
+				mock.ExpectQuery("SELECT (.+) FROM post").
 					WithArgs(args.authorId, args.sort.Before.Time(), args.sort.Before, *args.sort.First).
 					WillReturnRows(rows)
 			},
@@ -253,7 +252,7 @@ func TestPostRepository_Delete(t *testing.T) {
 			args:    args{id: ksuid.New(), authorId: ksuid.New()},
 			wantErr: false,
 			mockBehavior: func(args args) {
-				mock.ExpectExec(fmt.Sprintf(`DELETE FROM "%s"`, postgres.PostTable)).
+				mock.ExpectExec("DELETE FROM post").
 					WithArgs(args.id, args.authorId).
 					WillReturnResult(pgxmock.NewResult("", 1))
 			},
@@ -304,7 +303,7 @@ func TestPostRepository_Update(t *testing.T) {
 			args:    args{post: domain.Post{Id: ksuid.New(), AuthorId: ksuid.New(), Text: "text"}},
 			wantErr: false,
 			mockBehavior: func(args args) {
-				mock.ExpectExec(fmt.Sprintf(`UPDATE "%s"`, postgres.PostTable)).
+				mock.ExpectExec("UPDATE post").
 					WithArgs(args.post.Text, args.post.Id, args.post.AuthorId).
 					WillReturnResult(pgxmock.NewResult("", 1))
 			},
@@ -320,6 +319,65 @@ func TestPostRepository_Update(t *testing.T) {
 			err := repos.Update(context.Background(), tt.args.post)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("error updating post by id: %s", err.Error())
+			}
+		})
+	}
+}
+
+// Testing getting total author posts count in postgres database.
+func TestPostRepository_GetTotalCount(t *testing.T) {
+	// Creating a new mock connection.
+	mock, err := pgxmock.NewConn()
+	if err != nil {
+		t.Fatalf("error creating a new mock connection: %s", err.Error())
+	}
+	defer mock.Close(context.Background())
+
+	// Testing args.
+	type args struct{ authorId ksuid.KSUID }
+
+	// Test behavior.
+	type mockBehavior func(args args, want int32)
+
+	// Creating a new repository.
+	repos := postgres.NewPostRepository(mock)
+
+	// Tests structures.
+	tests := []struct {
+		name         string
+		args         args
+		want         int32
+		wantErr      bool
+		mockBehavior mockBehavior
+	}{
+		{
+			name: "OK",
+			args: args{authorId: ksuid.New()},
+			want: 10,
+			mockBehavior: func(args args, want int32) {
+				rows := mock.NewRows([]string{"count(*)"}).AddRow(want)
+
+				mock.ExpectQuery("SELECT (.+) FROM post").
+					WithArgs(args.authorId).
+					WillReturnRows(rows)
+			},
+		},
+	}
+
+	// Conducting tests in various structures.
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockBehavior(tt.args, tt.want)
+
+			// Getting total author posts count in postgres database.
+			got, err := repos.GetTotalCount(context.Background(), tt.args.authorId)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("error getting total post count: %s", err.Error())
+			}
+
+			// Check for similarity of post.
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Error("error count are not similar")
 			}
 		})
 	}

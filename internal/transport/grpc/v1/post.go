@@ -118,3 +118,13 @@ func (h *PostHandler) UpdatePost(ctx context.Context, input *v1.UpdatePostReques
 
 	return &v1.UpdatePostResponse{}, nil
 }
+
+// Getting total posts count.
+func (h *PostHandler) GetTotalPostsCount(ctx context.Context, input *v1.GetTotalPostsCountRequest) (*v1.GetTotalPostsCountResponse, error) {
+	count, err := h.service.GetTotalCount(ctx, ksuid.FromBytesOrNil(input.AuthorId))
+	if err != nil {
+		return &v1.GetTotalPostsCountResponse{}, err
+	}
+
+	return &v1.GetTotalPostsCountResponse{Count: count}, nil
+}

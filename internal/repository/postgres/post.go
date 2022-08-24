@@ -20,7 +20,6 @@ package postgres
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/durudex/durudex-post-service/internal/domain"
 	"github.com/durudex/durudex-post-service/pkg/database/postgres"
@@ -29,9 +28,6 @@ import (
 	"github.com/leporo/sqlf"
 	"github.com/segmentio/ksuid"
 )
-
-// Post table name.
-const PostTable string = "post"
 
 // Post repository interface.
 type Post interface {
@@ -45,6 +41,8 @@ type Post interface {
 	Delete(ctx context.Context, id, authorId ksuid.KSUID) error
 	// Updating a post in postgres database.
 	Update(ctx context.Context, post domain.Post) error
+	// Getting total author posts count in postgres database.
+	GetTotalCount(ctx context.Context, authorId ksuid.KSUID) (int32, error)
 }
 
 // Post repository structure.
@@ -58,7 +56,7 @@ func NewPostRepository(psql postgres.Postgres) *PostRepository {
 // Creating a new post in postgres database.
 func (r *PostRepository) Create(ctx context.Context, post domain.Post) error {
 	// Query to create post.
-	query := fmt.Sprintf(`INSERT INTO "%s" (id, author_id, text) VALUES ($1, $2, $3)`, PostTable)
+	query := "INSERT INTO post (id, author_id, text) VALUES ($1, $2, $3)"
 
 	// Scan post id.
 	if _, err := r.psql.Exec(ctx, query, post.Id, post.AuthorId, post.Text); err != nil {
@@ -73,14 +71,14 @@ func (r *PostRepository) Get(ctx context.Context, id ksuid.KSUID) (domain.Post, 
 	var post domain.Post
 
 	// Query for get post by id.
-	query := fmt.Sprintf(`SELECT "author_id", "text", "updated_at" FROM "%s" WHERE "id"=$1`, PostTable)
+	query := "SELECT author_id, text, updated_at FROM post WHERE id=$1"
 
 	row := r.psql.QueryRow(ctx, query, id)
 
 	// Scanning query row.
 	if err := row.Scan(&post.AuthorId, &post.Text, &post.UpdatedAt); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return domain.Post{}, &domain.Error{Code: domain.CodeNotFound, Message: "User not found"}
+			return domain.Post{}, &domain.Error{Code: domain.CodeNotFound, Message: "Post not found"}
 		}
 
 		return domain.Post{}, &domain.Error{Code: domain.CodeInternal, Message: "Internal Server Error"}
@@ -93,7 +91,7 @@ func (r *PostRepository) Get(ctx context.Context, id ksuid.KSUID) (domain.Post, 
 func (r *PostRepository) GetPosts(ctx context.Context, authorId ksuid.KSUID, sort domain.SortOptions) ([]domain.Post, error) {
 	var n int32
 
-	qb := sqlf.Select("id, text, updated_at").From(PostTable).Where("author_id = ?", authorId)
+	qb := sqlf.Select("id, text, updated_at").From("post").Where("author_id = ?", authorId)
 
 	// Added first or last sort option.
 	if sort.First != nil {
@@ -157,7 +155,7 @@ func (r *PostRepository) GetPosts(ctx context.Context, authorId ksuid.KSUID, sor
 // Deleting a post in postgres database.
 func (r *PostRepository) Delete(ctx context.Context, id, authorId ksuid.KSUID) error {
 	// Query for delete post by id.
-	query := fmt.Sprintf(`DELETE FROM "%s" WHERE id=$1 AND author_id=$2`, PostTable)
+	query := "DELETE FROM post WHERE id=$1 AND author_id=$2"
 	_, err := r.psql.Exec(ctx, query, id, authorId)
 
 	return err
@@ -166,8 +164,25 @@ func (r *PostRepository) Delete(ctx context.Context, id, authorId ksuid.KSUID) e
 // Updating a post in postgres database.
 func (r *PostRepository) Update(ctx context.Context, post domain.Post) error {
 	// Query for update post by id.
-	query := fmt.Sprintf(`UPDATE "%s" SET text=$1, updated_at=now() WHERE "id"=$2 AND author_id=$3`, PostTable)
+	query := "UPDATE post SET text=$1, updated_at=now() WHERE id=$2 AND author_id=$3"
 	_, err := r.psql.Exec(ctx, query, post.Text, post.Id, post.AuthorId)
 
 	return err
+}
+
+// Getting total author posts count in postgres database.
+func (r *PostRepository) GetTotalCount(ctx context.Context, authorId ksuid.KSUID) (int32, error) {
+	var count int32
+
+	// Query to get author posts total count.
+	query := "SELECT count(*) FROM post WHERE author_id=$1"
+
+	row := r.psql.QueryRow(ctx, query, authorId)
+
+	// Scanning query row.
+	if err := row.Scan(&count); err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }

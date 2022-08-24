@@ -94,6 +94,21 @@ func (mr *MockPostMockRecorder) GetPosts(ctx, authorId, sort interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPosts", reflect.TypeOf((*MockPost)(nil).GetPosts), ctx, authorId, sort)
 }
 
+// GetTotalCount mocks base method.
+func (m *MockPost) GetTotalCount(ctx context.Context, authorId ksuid.KSUID) (int32, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTotalCount", ctx, authorId)
+	ret0, _ := ret[0].(int32)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTotalCount indicates an expected call of GetTotalCount.
+func (mr *MockPostMockRecorder) GetTotalCount(ctx, authorId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTotalCount", reflect.TypeOf((*MockPost)(nil).GetTotalCount), ctx, authorId)
+}
+
 // Update mocks base method.
 func (m *MockPost) Update(ctx context.Context, post domain.Post) error {
 	m.ctrl.T.Helper()
